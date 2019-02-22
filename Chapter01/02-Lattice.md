@@ -1,24 +1,26 @@
----
-title: "Chapter 1 - Lattice Chart"
-output:
-  github_document
----
+Chapter 1 - Lattice Chart
+================
 
-## Demo using Lattice
+Demo using Lattice
+------------------
 
 ### Installation process
 
 Install the lattice package
 
-` install.packages("lattice") `
+`install.packages("lattice")`
 
 Loading lattice package
-```{r}
+
+``` r
 library(lattice)
 ```
 
+    ## Warning: package 'lattice' was built under R version 3.5.2
+
 Create a data frame
-```{r}
+
+``` r
 df <- data.frame(
   Name = c("a","b","c"),
   Value = c(1,2,3))
@@ -27,15 +29,19 @@ df <- data.frame(
 ### Plot
 
 Plot with defaults
-```{r}
+
+``` r
 dotplot(
   x = Value ~ Name,
   data = df
 )
 ```
 
+![](02-Lattice_files/figure-markdown_github/unnamed-chunk-3-1.png)
+
 Plot with parameters
-```{r}
+
+``` r
 dotplot(
   x = Value ~ Name,
   data = df,
@@ -44,10 +50,13 @@ dotplot(
   ylab="Value")
 ```
 
+![](02-Lattice_files/figure-markdown_github/unnamed-chunk-4-1.png)
+
 ### Bar chart
 
 Create a bar chart
-```{r}
+
+``` r
 barchart(
   x = Value ~ Name,
   data = df,
@@ -57,6 +66,9 @@ barchart(
   ylab="Value")
 ```
 
+![](02-Lattice_files/figure-markdown_github/unnamed-chunk-5-1.png)
+
 ### Help files
-`?barchart`  
+
+`?barchart`
 `?formula`

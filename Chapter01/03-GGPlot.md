@@ -1,30 +1,33 @@
----
-title: "Chapter 1 - GGPlot Chart"
-output:
-  github_document
----
+Chapter 1 - GGPlot Chart
+================
 
-## Demo using GGPlot
+Demo using GGPlot
+-----------------
 
 ### Installation process
-Install the ggplot2 package  
+
+Install the ggplot2 package
 `install.package(ggplot2)`
 
 Load the ggplot2 package
-```{r}
+
+``` r
 library(ggplot2)
 ```
 
 Create a data frame
-```{r}
+
+``` r
 df <- data.frame(
   Name = c("a","b","c"),
   Value = c(1,2,3))
 ```
 
 ### Plot
+
 Plot with defaults
-```{r}
+
+``` r
 ggplot(
 data = df,
   aes(
@@ -33,10 +36,12 @@ data = df,
     geom_point()
 ```
 
-Plot with parameters  
+![](03-GGPlot_files/figure-markdown_github/unnamed-chunk-3-1.png)
+
+Plot with parameters
 *Note ggplot2 add layers to the chart*
 
-```{r}
+``` r
 ggplot(
   data = df,
   aes(
@@ -46,13 +51,15 @@ ggplot(
   ggtitle("Hello world") + 
   xlab("Name") +
   ylab("Value")
-
 ```
+
+![](03-GGPlot_files/figure-markdown_github/unnamed-chunk-4-1.png)
 
 ### Bar chart
 
 Create a bar chart
-```{r}
+
+``` r
 ggplot(
   data = df,
   aes(
@@ -64,11 +71,13 @@ ggplot(
   ggtitle("Hello world") +
   xlab("Name") +
   ylab("Value")
-    
 ```
 
+![](03-GGPlot_files/figure-markdown_github/unnamed-chunk-5-1.png)
+
 ### Help files
-` ?ggplot `  
-` ?aes `  
-` ?geom_bar `  
-` ?ggtitle `
+
+`?ggplot`
+`?aes`
+`?geom_bar`
+`?ggtitle`
