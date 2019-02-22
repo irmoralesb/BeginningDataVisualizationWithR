@@ -1,0 +1,13 @@
+Qualitative Univariate Analysis
+================
+
+This focus on categories or non-numeric variables, and we are interested on, for instance:
+
+    * Frequency
+    * Average
+
+Questions to answer
+-------------------
+
+    1. How many movies in each rating category?  
+    2. What proporcion of movies have won awards?

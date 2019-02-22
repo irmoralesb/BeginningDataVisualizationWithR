@@ -1,0 +1,71 @@
+---
+title: "R Notebook"
+output: github_document
+---
+
+## Setup the environment
+
+Set working directory (no needed if working on R project)  
+`setwd("path")`  
+
+Load movie data from CSV file
+```{r}
+movies <- read.csv("../data/Movies.csv")
+```
+
+Peek at the data
+```{r}
+head(movies)
+```
+
+## Univariate visualization for a qualitative variable
+
+Create a frequency bar chart of ratings, *the chart internally resolve to display data as bar chart*
+```{r}
+plot(
+  x = movies$Rating,
+  main = "Count of Movies by Rating",
+  xlab = "Raiting",
+  ylab = "Count of Movies"
+)
+```
+
+Create a horizontal frecuency chart of ratings
+```{r}
+plot(
+  x= movies$Rating,
+  horiz = TRUE,
+  main ="Count of Movies by Rating",
+  xlab = "Count of Movies",
+  ylab = "Rating"
+)
+```
+
+Create a Cleveland dot plot, *this is pretty much the same than the bar chart*
+
+```{r}
+dotchart(
+  x = table(movies$Rating),
+  pch = 16,
+  main = "Count of Movies by Rating",
+  xlab = "Count of Movies",
+  ylab = "Rating"
+)
+```
+
+Create a Pie chart of ratings
+```{r}
+pie(
+  x = table(movies$Rating),
+  main = "Count of Movies by Rating")
+```
+
+Create pie chart of awards
+
+```{r}
+pie(
+  x = table(movies$Awards),
+  clockwise = TRUE,
+  main="Proportion of Movies that Won Awards"
+)
+```

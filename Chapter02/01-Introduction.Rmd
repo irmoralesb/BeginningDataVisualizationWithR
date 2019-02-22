@@ -1,0 +1,15 @@
+---
+title: "Qualitative Univariate Analysis"
+output: github_document
+---
+
+This focus on categories or non-numeric variables, and in this case we are interested on only one variable, and we are interested on, for instance:  
+
+    * Frequency
+    * Average
+    
+## Questions to answer
+
+    1. How many movies in each rating category?  
+    2. What proporcion of movies have won awards?
+    
