@@ -1,0 +1,72 @@
+---
+title: "Visualizing one categorical Variable - Lattice"
+output: github_document
+---
+
+## Environment setup
+
+```{r}
+library(lattice)
+```
+
+Load movie data from CSV file
+```{r}
+movies <- read.csv("../data/Movies.csv")
+```
+
+Create frequency table of ratings
+
+```{r}
+table <- table(movies$Rating)
+ratings <- as.data.frame(table)
+names(ratings)[1] <- "Rating"
+names(ratings)[2] <- "Count"
+
+print(ratings)
+```
+
+
+## Frequency bar chart
+
+Create a frequency bar chart
+```{r}
+barchart(
+  x= Count ~ Rating,
+  data = ratings,
+  main = "Count of Movies by rating",
+  xlab = "Rating"
+)
+```
+
+Create a horizontal bar chart
+```{r}
+barchart(
+  x = Rating ~ Count,
+  data = ratings,
+  main = "Count of Movies by rating",
+  xlab = "Count"
+)
+```
+
+## Cleveland dot plot
+
+Create Cleveland dot plot
+```{r}
+dotplot(
+  x = Rating ~ Count,
+  data = ratings,
+  main = "Count of Movies by Rating",
+  ylab = "Rating")
+```
+
+## Histogram chart
+*Lattice does not have pie chart*
+
+Create a part-of-whole frequency bar chart
+```{r}
+histogram(
+  x = ~Rating,
+  data = movies,
+  main = "Percentage of Movies by Rating"
+)
+```

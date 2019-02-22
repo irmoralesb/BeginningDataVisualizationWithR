@@ -1,9 +1,9 @@
 ---
-title: "R Notebook"
+title: "Visualizing one categorical Variable - Base"
 output: github_document
 ---
 
-## Setup the environment
+## Environment setup 
 
 Set working directory (no needed if working on R project)  
 `setwd("path")`  
