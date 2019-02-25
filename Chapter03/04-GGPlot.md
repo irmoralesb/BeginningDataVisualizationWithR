@@ -15,11 +15,6 @@ Setup environment
 
 ``` r
 library(ggplot2)
-```
-
-    ## Warning: package 'ggplot2' was built under R version 3.5.2
-
-``` r
 movies = read.csv("../data/Movies.csv")
 main_title <- "Distribution of Movies Runtimes"
 x_lab = "Runtime in minutes"
@@ -117,13 +112,8 @@ All in one
 Plot small multiples of all four
 
 ``` r
-dev.off()
-```
+while (!is.null(dev.list()))  dev.off()
 
-    ## null device 
-    ##           1
-
-``` r
 library(grid)
 
 viewport <- viewport(
@@ -161,11 +151,7 @@ print(
   vp = viewport(
     layout.pos.row = 2,
     layout.pos.col = 1))
-```
 
-    ## Warning: Continuous x aesthetic -- did you forget aes(group=...)?
-
-``` r
 hist <- ggplot(
     data = movies, 
     aes(x = Runtime)) +
@@ -179,11 +165,7 @@ print(
   vp = viewport(
     layout.pos.col = 1,
     layout.pos.row = 3)) 
-```
 
-    ## Warning: Removed 2 rows containing missing values (geom_bar).
-
-``` r
 density <- ggplot(
     data = movies, 
     aes(x = Runtime)) +

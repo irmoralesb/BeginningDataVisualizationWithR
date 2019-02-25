@@ -1,42 +1,9 @@
----
-title: "Visualizing One Numeric Variable"
-output: github_document
----
 
-We are requested to answer these questions:
-
-    1. What is the average movie runtime?
-    2. Are there any outliers?
-    3. How spread out are the movie runtimes?
-    4. What is the shape of the runtime distribution?
-    
-    
-Univariate visualizations of a quantitiative variable
-
-
-## Setup environment
-
-```{r}
 library(ggplot2)
 movies = read.csv("../data/Movies.csv")
 main_title <- "Distribution of Movies Runtimes"
 x_lab = "Runtime in minutes"
-```
 
-## Plot
-
-Create dot plot
-```{r}
-ggplot(
-  data = movies,
-  aes(x=Runtime, stat= "Count")) +
-  geom_dotplot(binwidth = 1) +
-  ggtitle(main_title) + 
-  xlab(x_lab)
-```
-
-Create a Violin-Style dot plot
-```{r}
 ggplot(
   data = movies,
   aes(x = Runtime, stat = "count")) +
@@ -45,12 +12,7 @@ ggplot(
     stackdir = "center") +
   ggtitle(main_title) +
   xlab(x_lab)
-```
 
-## Boxplot
-
-Create box plot of runtime
-```{r}
 ggplot(
   data = movies,
   aes(x= Runtime, y=Runtime)) +
@@ -62,39 +24,24 @@ ggplot(
   theme(
     axis.text.y = element_blank(),
     axis.ticks.y = element_blank())
-```
 
-## Histogram
-
-Create histogram with ggplot
-
-```{r}
 ggplot(
-data = movies,
-aes(x = Runtime)) +
-geom_histogram(binwidth = 10) +
+  data = movies,
+  aes(x = Runtime)) +
+  geom_histogram(binwidth = 10) +
   ggtitle(main_title) + 
   xlab(x_lab)
-```
 
-## Density plot
-
-Create density plot with ggplot
-
-```{r}
 ggplot(
   data = movies,
   aes(x=Runtime)) +
   geom_density() +
   ggtitle(main_title) +
   xlab(x_lab)
-```
 
-## All in one
 
-Plot small multiples of all four
-
-```{r warning=FALSE}
+#Plot small multiples of all four
+# This was not working on R notebooks, so testing out for standard R script file
 while (!is.null(dev.list()))  dev.off()
 
 library(grid)
@@ -136,12 +83,12 @@ print(
     layout.pos.col = 1))
 
 hist <- ggplot(
-    data = movies, 
-    aes(x = Runtime)) +
-    geom_histogram(binwidth = 10) +
-    scale_x_continuous(
-        limits = c(0, 250)) +
-    xlab("")
+  data = movies, 
+  aes(x = Runtime)) +
+  geom_histogram(binwidth = 10) +
+  scale_x_continuous(
+    limits = c(0, 250)) +
+  xlab("")
 
 print(
   x = hist,
@@ -150,18 +97,15 @@ print(
     layout.pos.row = 3)) 
 
 density <- ggplot(
-    data = movies, 
-    aes(x = Runtime)) +
-    geom_density() +
-    scale_x_continuous(
-        limits = c(0, 250)) +
-    xlab(x_lab)
+  data = movies, 
+  aes(x = Runtime)) +
+  geom_density() +
+  scale_x_continuous(
+    limits = c(0, 250)) +
+  xlab(x_lab)
 
 print(
   x = density,
   vp = viewport(
     layout.pos.col = 1,
     layout.pos.row = 4))
-
-```
-
