@@ -1,0 +1,108 @@
+Visualizing Two Numeric Variables
+================
+
+Quantitative Bivariate Analysis
+===============================
+
+*In this topic we are covering the relationship between two numeric variables.*
+
+    * Interested in how two numeric variables are related
+    * Location, Spread and Shape of the distribution at the same time
+    * Time series analysis
+
+Plots
+-----
+
+### Scatterplot
+
+It allows to see the relationship between two numeric variables on 2d. **Correlation** between variables.
+
+#### Correlation
+
+    * It can be strong if there a related behavior between the variables, or Weak if not.
+    * Positive correlation is if the drawn line points to the top right corner
+
+This plot is used to answer:
+
+    * Correlation
+    * Shape, density of the observations
+
+### Binned Frequency Heatmap
+
+AKA:
+
+    * Binned Scatter plot
+    * 2D histogram
+
+Used for
+
+    * Joint frequency
+    * Large data sets
+
+The heat map can be seen as a histogram, but instead of using bars, the dark color represents the most concentration or most samples.
+
+### Hexagonal Binned Frequency Heatmap
+
+    * Used to answer the same questions than Binned Frequence Heatmap.
+    * Hexagonal bins
+    * Preferred shape over squared or circular shapes
+
+### Countour Plot
+
+This represents visualization also on Z-axis, so there is an elevation towards you. this is where the data is concentrated.
+
+    * Countour lines
+    * Joint density
+
+### Level Plot
+
+This is similar to Countour plot, but color is added
+
+    * Colored levels
+    * Lower data-to-ink
+
+### Mesh Plot
+
+This is a 3D of the joint density distribution of two quantitative variable
+
+    * Drape with mesh
+    * Pros & Cons
+        - Allows to see the elevation at any point
+        - The previous point sometimes add complexity to see aditional data depending of the perspective
+        - Keep in mind audience for using this.
+        
+
+### Surface Plot
+
+Similar to Mesh plot, but they do not have warped mesh draped on the surface on the plot, rather, they draped color to display density
+
+    * Draped with color
+    * Pros & Cons
+        - By giving up the warped mesh we can no longer easly trace any x or y along the surface of the plot to see what elevation is at that point
+        - It is easier to see the relative elevation of multiple peaks
+
+Charts
+------
+
+### Step Chart
+
+    * X-axis represent time
+    * Quantitative variable
+    * Change over time
+    * Constant values during period of time
+
+### Line Chart
+
+Similar to Step chart, rather than displays values as contants throughout each time period, they show the rate of change from one time period to the next.
+
+    * Change value over time
+    * Rate of change
+
+### Area chart
+
+Similar to Line chart, but it displays the are unnderneath the line as solid color
+
+Answer questions related to&gt;
+
+    * Change over time
+    * Volume / summation
