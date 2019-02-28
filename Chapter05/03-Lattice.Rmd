@@ -1,0 +1,231 @@
+---
+title: "Visualizing Two Numeric Variables"
+output: github_document
+---
+
+We are requested to answer these questions:
+
+    1. How are runtime and box-office revenue related?
+    2. Has the average box-office revenue changed over time?
+    
+    
+*Bivariate Visualization for two quantitiative variables*
+## Setting up environment
+
+```{r}
+library(lattice)
+movies <- read.csv('../data/Movies.csv')
+main_label <- "Runtime vs. Box Office Revenue"
+runtime_in_minutes_label <- "Runtime (minutes)"
+box_office_label <- "Box Office ($M)"
+density_label <- "Density"
+```
+
+## Plots
+
+
+### Scatter Plot
+Create a scatterplot
+
+```{r}
+xyplot(
+  x = Box.Office ~ Runtime,
+  data = movies,
+  main = main_label,
+  xlab = runtime_in_minutes_label,
+  ylab = box_office_label)
+```
+
+#### Adding a regression line
+
+```{r}
+xyplot(
+  x = Box.Office ~ Runtime,
+  data = movies,
+  type = c("p","r"), # p stands for points and r stands for regression
+  main = main_label,
+  xlab = runtime_in_minutes_label,
+  ylab = box_office_label)
+```
+
+### Load hexbin library
+```{r}
+library(hexbin)
+```
+
+### Hexagonal binned frequency heatmap
+
+Create hexagonal binned frequency heatmap
+
+```{r}
+hexbinplot(
+  x = Box.Office ~ Runtime,
+  data = movies,
+  xbins = 30,
+  main = main_label,
+  xlab = runtime_in_minutes_label,
+  ylab = box_office_label)
+```
+
+### Grid from our 2D kernel density estimate
+
+#### MASS Package
+
+For the following plots we need to create a 2D kernel density estimate using MASS, to install it we execute `install.packages("MASS")`  
+
+Now we load the library
+```{r}
+library(MASS)
+```
+
+Now create a 2D kernel density estimation
+
+```{r}
+density2d <- kde2d(
+  x = movies$Runtime,
+  y = movies$Box.Office,
+  n = 50)
+```
+
+
+Create a grid from our 2D kernel density estimate, the data structure is a *data frame*
+
+```{r}
+grid <- expand.grid(
+  x = density2d$x,
+  y = density2d$y)
+
+grid$z <- as.vector(density2d$z)
+```
+
+Display the data frame
+
+```{r}
+head(grid)
+```
+
+### Contour plot of density
+
+Create a contour plot of density
+
+```{r}
+contourplot(
+  x = z ~ x* y,
+  data = grid,
+  main = main_label,
+  xlab = 
+)
+```
+
+
+### Level plot of density
+
+Create a level plot of density
+
+```{r}
+levelplot(
+  x = z ~ x * y,
+  data = grid,
+  main = main_label,
+  xlab = runtime_in_minutes_label,
+  ylab = box_office_label)
+```
+
+### Mesh plot
+
+Create mesh plot of density
+
+```{r}
+wireframe(
+  x = z ~ x * y,
+  data = grid,
+  main = main_label,
+  xlab = runtime_in_minutes_label,
+  ylab = box_office_label,
+  zlab = density_label)
+```
+
+### Surface plot
+
+Create surface plot of density
+
+```{r}
+wireframe(
+  x = z ~ x * y,
+  data = grid,
+  drape = TRUE,
+  main = main_label,
+  xlab = runtime_in_minutes_label,
+  ylab = box_office_label,
+  zlab = density_label)
+```
+
+### Load time series data
+
+Load time series data
+```{r}
+timeSeries <- read.csv("../data/Timeseries.csv")
+```
+
+Display the time series data
+
+```{r}
+head(timeSeries)
+```
+
+### Step chart
+
+Create a step chart
+
+```{r}
+xyplot(
+  x = Box.Office ~ Year,
+  data = timeSeries,
+  type = 's',
+  ylim = c(0,max(timeSeries$Box.Office)),
+  main = "Average Box Office Revenue by Year",
+  xlab = "Year",
+  ylab = box_office_label)
+```
+
+
+### Line chart
+
+Create a line chart
+
+```{r}
+ xyplot(
+   x = Box.Office ~ Year,
+   data = timeSeries,
+   type = "l",
+   ylim = c(0, max(timeSeries$Box.Office)),
+   main = "Average Box Office Revenue by Year",
+   xlab = "Year",
+   ylab = box_office_label)
+```
+
+### Area chart
+
+#### LatticeExtra library
+
+We need to install "latticeExtra" library to create area charts.
+
+Installation command `install.packages("latticeExtra")`
+
+Loading the library
+```{r}
+library("latticeExtra")
+```
+
+Area Chart
+
+```{r}
+xyplot(
+  x = Box.Office ~ Year,
+  data = timeSeries,
+  panel = panel.xyarea,
+  ylim = c(0, max(timeSeries$Box.Office)),
+  main = "Average Box Office Revenue by Year",
+  xlab = "Year",
+  ylab = box_office_label)
+```
