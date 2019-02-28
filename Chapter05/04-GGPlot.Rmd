@@ -1,0 +1,24 @@
+---
+title: "Visualizing Two Numeric Variables"
+output: github_document
+---
+
+We are requested to answer these questions:
+
+    1. How are runtime and box-office revenue related?
+    2. Has the average box-office revenue changed over time?
+    
+    
+*Bivariate Visualization for two quantitiative variables*
+## Setting up environment
+
+```{r}
+library(lattice)
+movies <- read.csv('../data/Movies.csv')
+main_label <- "Runtime vs. Box Office Revenue"
+runtime_in_minutes_label <- "Runtime (minutes)"
+box_office_label <- "Box Office ($M)"
+density_label <- "Density"
+```
+
+## Plots
