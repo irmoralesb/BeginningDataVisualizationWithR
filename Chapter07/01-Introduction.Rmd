@@ -1,0 +1,118 @@
+---
+title: "Moving Beyond the Basics"
+output: html_notebook
+---
+
+# Additional types of data analysis
+
+There are some additional types of data analysis, such as:
+
+    * Trivariate Analysis
+      - Qualitative Trivariate Analysis
+      - 2 Qual. 1 Quant. Analysis
+      - 1 Qual. 1 Quant. Analysis
+      - Quantitative Trivariate Analysis
+    * n-variable Multivariate Analysis
+    * Spatial Analysis
+    * Hierarchichal Analysis
+    * Graph Analysis
+    * Textual Analysis
+    
+    
+# Best Practices
+
+
+    1. Star with a question
+    2. Use the right tool for the job
+      a. Take into account the audience.
+    3. Know your audience
+      a. Exploratory data visualization
+      b. Expository or explanatory data visualization
+    4. Remove the junk, that is the unneeded components in the chart.
+      a. Keep it clean and simple.
+    5. Avoid Information distortions
+      a. for instance show the entire Y-axis value range.
+    
+# Demo
+
+##Cleaning up data visualizations
+
+Create a frequency bar chart with defaults
+
+```{r}
+movies <- read.csv("../data/Movies.csv")
+plot(movies$Rating)
+```
+
+Add context to our bar chart
+
+```{r}
+plot(
+  x = movies$Rating,
+  main = "Count of Movies by MPAA Rating Category",
+  xlab = "MPAA Rating Category",
+  ylab = "Count of Movies")
+```
+
+Create a color palette
+
+```{r}
+install.packages("RColorBrewer")
+library(RColorBrewer)
+palette <- brewer.pal(9,"Pastel1")
+```
+
+Clean up our bar chart
+
+```{r}
+plot(
+  x = movies$Rating,
+  col = palette[2],
+  border = NA,
+  main = "Count of Movies by MPAA Rating Category",
+  xlab = "MPAA Rating Category",
+  ylab = "Count of Movies")
+```
+
+Save as PNG image
+Note, other formats are PDF and SVG.
+
+```{r}
+png(
+  filename = "Count of Movies by Rating.png",
+  width = 640,
+  height = 480)
+
+plot(
+  x = movies$Rating,
+  col = palette[2],
+  border = NA,
+  main = "Count of Movies by MPAA Rating Category",
+  xlab = "MPAA Rating Category",
+  ylab = "Count of Movies")
+```
+
+Then we need to close the graphics device
+
+```{r}
+#dev.off()
+```
+
+Save the ggplot data visualization
+
+```{r}
+?ggsave
+```
+
+
+View help for plots and parameters
+```{r}
+?barplot
+
+?par
+```
+
+
+
+
+
