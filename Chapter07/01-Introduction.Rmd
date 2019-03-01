@@ -1,6 +1,6 @@
 ---
 title: "Moving Beyond the Basics"
-output: html_notebook
+output: github_document
 ---
 
 # Additional types of data analysis
