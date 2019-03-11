@@ -1,0 +1,166 @@
+---
+title: "Google Play Apps"
+output: github_document
+---
+
+
+# Data Visualization of Google Play Apps
+
+## Dataset Description
+
+Dataset downloaded from: https://www.kaggle.com/lava18/google-play-store-apps
+
+Loading the dataset
+
+```{r warning=FALSE, message=FALSE}
+library(tidyverse)
+library(ggplot2)
+library(lattice)
+library(latticeExtra)
+
+apps_dataset_original = read.csv("../../data/googleplaystore.csv", header = TRUE, sep = ",")
+
+#class(apps_dataset)
+head(as.tibble(apps_dataset_original))
+```
+
+
+## Column types
+Let's confirm the column types are correct.  
+
+### App Feature
+
+From previous point, we can see the App column, which contains app names, is factor data type, we need to change it to character.
+
+```{r}
+apps_dataset_original = read.csv("../../data/googleplaystore.csv", header = TRUE, sep = ",", as.is = c("App"))
+
+head(as.tibble(apps_dataset_original))
+```
+
+### Reviews Feature
+
+We see this feature is set as factor when it must be numeric
+```{r}
+apps_dataset_original %>%
+  filter(is.na(as.numeric(Reviews))) %>%
+  select(App)
+```
+So, Reviews contains only numeric entries, so we convert those explicit
+
+```{r}
+apps_dataset <-  apps_dataset_original %>% 
+  mutate(Reviews = as.numeric(Reviews))
+
+head(as.tibble(apps_dataset))
+```
+
+The Reviews feature is now numeric, let's check if there are NAs
+
+```{r}
+na_counter <-sum(is.na(apps_dataset[,4]))
+sprintf("There are %d Reviews with NA", na_counter)
+```
+So we are done with this feature.
+
+### Size Feature
+
+This feature seems to be useful if we use it as numeric, anyway we need to remove the 'M' character, but we are not sure there are other measurement units, such as GB, KB, etc.
+
+
+```{r}
+apps_dataset %>% 
+  mutate(SizeNumeric = as.numeric(Size)) %>%
+  filter(is.na(SizeNumeric)) %>% 
+  select(Size, SizeNumeric) %>% head()
+
+```
+
+**Interesting** the conversion does not fail, but the converted values are not the expected ones. so we are going to proceed to remove all non numeric characters, following this convention:
+
+    * All values measure using M, will get rid of M, and converted
+    * All values measure using k, will get rid of k, and converted into M scale
+    * All values measure using +, will get rid of +, and as kept into M scale
+    * 'Varies with device' will be set as NA
+    
+
+Those conventions were determined after some data exploration, you can see in the code below all we have remove
+
+```{r}
+
+pattern <- "(M[a-zA-Z]+)|([a-jl-zA-LN-Z])"
+
+apps_dataset %>% filter(str_detect(Size, pattern = pattern) & Size != 'Varies with device') %>%
+  select(App, Size) %>% 
+  group_by(Size) %>%
+  summary()
+  
+```
+
+So We have detected that also k is added to the app size measurement, the observation is added to the previous list
+
+
+
+## Record Counting
+
+How many apps are there?
+
+```{r}
+rows_total <- nrow(apps_dataset)
+rows_without_na <- nrow(na.omit(apps_dataset))
+
+sprintf("Total apps %d", rows_total)
+sprintf("Total apps %d, removing na", rows_without_na)
+```
+
+
+
+
+
+## Data wrangling
+
+Let's clean up our data.
+
+
+
+## NAs
+
+Let's take a look at those features that contains NAs
+
+```{r}
+colnames(apps_dataset)[colSums(is.na(apps_dataset)) > 0]
+```
+
+Let's confirm how many observations there are with NA
+
+We see Rating column is numeric
+```{r}
+class(apps_dataset$Rating)
+```
+
+Therefore those recods are missing, it may be due to:
+
+    * They are new and there are no yet any rating.
+    * There may be a new version with no ratings yet.
+    * Messing value
+    * It may be around for a while and it has no download (or almost none)
+    
+
+```{r}
+apps_without_ratings <-  apps_dataset %>% 
+  filter(is.na(Rating)) %>%
+  nrow()
+
+sprintf("There are %d without ratings", apps_without_ratings)
+```
+
+Let's see if they must be considered, or at least which ones...
+
+
+```{r}
+newest_app_date <- apps_dataset %>%  select(Last.Updated) 
+class(newest_app_date$Last.Updated)
+head(newest_app_date)
+```
+
+
