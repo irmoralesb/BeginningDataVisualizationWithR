@@ -1,0 +1,88 @@
+---
+title: "Visualizing both a categorical and a numeric variable"
+output: github_document
+---
+
+We are requested to answer:
+
+    1. How does average box-office revenue compare across raings?
+    2. How similar are the spreads of box-office revenue across ratings?
+    3. How do their shapes compare?
+    
+*Bivariate visualizations for bith qualitiative and quantitiative bivariate variable*
+
+## Setting up environment
+
+```{r}
+movies <- read.csv("../data/Movies.csv")
+main_label <- "Average Box-Office Revenue by Rating"
+rating_label <- "Rating"
+box_office_label <- "Box Office ($M)"
+library(ggplot2)
+library(dplyr)
+```
+
+## Plots
+Create table of average box office by rating
+
+```{r}
+average  <- movies %>% 
+  select(Rating, Box.Office) %>%
+  group_by(Rating) %>%
+  summarize(Box.Office = mean(Box.Office)) %>%
+  as.data.frame()
+
+print(average)
+```
+
+### Bivariate bar chart
+
+```{r}
+ggplot(
+  data = average,
+  aes(x =Rating, y = Box.Office)) +
+  geom_bar(stat = "identity") +
+  ggtitle(main_label) +
+  xlab(rating_label) +
+  ylab(box_office_label)
+```
+
+### Boxplot
+
+```{r}
+main_label <- "Box Office Revenue by Rating"
+ggplot(
+  data = movies,
+  aes(x = Rating, y = Box.Office)) +
+  geom_boxplot() +
+  ggtitle(main_label) + 
+  xlab(rating_label) +
+  ylab(box_office_label)
+```
+
+### Notched boxplot
+
+```{r}
+main_label <- "Box Office Revenue by Rating"
+ggplot(
+  data = movies,
+  aes(x = Rating, y = Box.Office)) +
+  geom_boxplot(notch = TRUE) +
+  ggtitle(main_label) + 
+  xlab(rating_label) +
+  ylab(box_office_label)
+
+```
+
+### Violin plot
+
+```{r}
+ggplot(
+  data = movies,
+  aes(x= Rating, y = Box.Office)) +
+  geom_violin() +
+  ggtitle(main_label) +
+  xlab(rating_label) +
+  ylab(box_office_label)
+```
+
