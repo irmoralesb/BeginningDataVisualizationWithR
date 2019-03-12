@@ -17,6 +17,7 @@ library(tidyverse)
 library(ggplot2)
 library(lattice)
 library(latticeExtra)
+library(lubridate)
 
 apps_dataset_original = read.csv("../../data/googleplaystore.csv", header = TRUE, sep = ",")
 
@@ -25,8 +26,8 @@ head(as.tibble(apps_dataset_original))
 ```
 
 
-## Column types
-Let's confirm the column types are correct.  
+## Data wrangling
+Let's confirm the column types are correct and also the values.  
 
 ### App Feature
 
@@ -37,6 +38,42 @@ apps_dataset_original = read.csv("../../data/googleplaystore.csv", header = TRUE
 
 head(as.tibble(apps_dataset_original))
 ```
+
+
+
+### Rating feature
+
+Let's take a look at those features that contains NAs
+
+```{r}
+colnames(apps_dataset_original)[colSums(is.na(apps_dataset_original)) > 0]
+```
+
+Let's confirm how many observations there are with NA
+
+We see Rating column is numeric
+```{r}
+class(apps_dataset_original$Rating)
+```
+
+Therefore those recods are missing, it may be due to:
+
+    * They are new and therefore there are no yet any rating
+    * There may be a new version with no ratings yet.
+    * Missing value
+    * It may be around for a while and it has no download (or almost none)
+    
+
+```{r}
+apps_without_ratings <-  apps_dataset_original %>% 
+  filter(is.na(Rating)) %>%
+  nrow()
+
+sprintf("There are %d without ratings", apps_without_ratings)
+```
+
+**So far we are going to keep the observations that no contains ratings**
+
 
 ### Reviews Feature
 
@@ -65,14 +102,14 @@ So we are done with this feature.
 
 ### Size Feature
 
-This feature seems to be useful if we use it as numeric, anyway we need to remove the 'M' character, but we are not sure there are other measurement units, such as GB, KB, etc.
+This feature seems to be useful if we use it as numeric, anyway we need to remove the 'M' character, but we are not sure if there are other measurement units, such as GB, KB, etc.
 
 
 ```{r}
 apps_dataset %>% 
   mutate(SizeNumeric = as.numeric(Size)) %>%
   filter(is.na(SizeNumeric)) %>% 
-  select(Size, SizeNumeric) %>% head()
+  select(Size, SizeNumeric) %>% head(n = 30)
 
 ```
 
@@ -99,6 +136,136 @@ apps_dataset %>% filter(str_detect(Size, pattern = pattern) & Size != 'Varies wi
 
 So We have detected that also k is added to the app size measurement, the observation is added to the previous list
 
+#### Create new Size column with the numeric type only
+
+```{r}
+pattern = "([Mk])"
+apps_dataset <- apps_dataset %>%
+  mutate(SizeNumeric = str_replace(as.character(Size), "Varies with device", "")) %>%
+  mutate(SizeNumeric = str_replace(SizeNumeric,pattern = pattern , "")) %>%
+  mutate(SizeNumeric = as.numeric(SizeNumeric)) %>%
+  filter(!is.na(SizeNumeric)) 
+
+# There are only numeric values
+apps_dataset %>%
+  #filter(!is.numeric(SizeNumeric)) %>%
+  filter(is.na(SizeNumeric)) %>%  
+  select(Size, SizeNumeric) %>% 
+  count()
+  
+
+```
+
+### Install feature
+
+We may need to keep it as factor, but we also will need it as numeric, so we are creating a second column with those values
+
+we need to remove: **",","+" **
+    
+```{r}
+apps_dataset <- apps_dataset %>% 
+  mutate(InstallsNumeric = str_replace_all(Installs, "[,*+$]", "")) %>%
+  mutate(InstallsNumeric = as.numeric(InstallsNumeric))
+  #select(Installs, InstallsNumeric) %>% 
+  #head(n = 20)
+na_counter <- apps_dataset %>% 
+    filter(is.na(InstallsNumeric)) %>%
+    count()
+
+sprintf("There are %d NAs", sum(na_counter))
+  
+```
+
+### Price feature
+
+The price feature is set as factor, we need to convert it to numeric
+
+```{r}
+apps_dataset %>%
+  filter(is.na(as.numeric(Price))) %>%
+  group_by(Type) %>%
+  select(Type) %>%
+  summary()
+
+```
+There are no NAs  
+
+Let's validate there are no format characters
+
+```{r}
+apps_dataset %>%
+  filter(str_detect(Price,pattern = "[a-zA-Z,$]")) %>%
+  select(Price) %>%
+  head()
+
+```
+
+There are format characters, so we need to clean up
+
+```{r}
+apps_dataset <- apps_dataset %>% 
+  mutate(PriceNumeric = as.numeric(str_replace_all(Price,pattern = "[a-zA-Z,$]","")))
+  
+
+```
+
+**Is there any Free application with Price different from 0?**
+
+```{r}
+apps_dataset %>%  filter(Type == 'Free' & Price != '0') %>% count()
+```
+**there is none**
+
+
+**Is there any not free application but the price is 0?**
+
+```{r}
+apps_dataset %>%  filter(Type != 'Free' & Price == '0') %>% count()
+```
+**Also there is none**
+
+We didn't get any NA message when converting the Price column, but we are going to double check
+
+```{r}
+apps_dataset %>%
+  filter(is.na(PriceNumeric)) %>%
+  count()
+
+```
+
+Let's check what is the max and min prices (for min we are expecting 0)
+
+```{r}
+apps_dataset %>%  
+  select(PriceNumeric) %>%
+  summary(PriceNumeric) 
+```
+
+### Last updated feature
+
+We also need to set the dates in a valid format
+
+Let's see if there are more than one format
+
+```{r}
+pattern = "[a-zA-Z]{3,9}\\s[0-9]{1,2},\\s[0-9]{4}"
+
+match_counter <- apps_dataset %>% filter(str_detect(as.character(Last.Updated), pattern =  pattern)) %>% count()
+sprintf("Matching %d of %d", sum(match_counter), nrow(apps_dataset))
+
+```
+
+So all dates seem to be in the same format, so we can convert.
+
+```{r}
+
+apps_dataset <- apps_dataset %>%
+  mutate(Last.UpdatedDate = mdy(Last.Updated))
+
+head(as.tibble(apps_dataset$Last.UpdatedDate))
+
+```
+
 
 
 ## Record Counting
@@ -117,50 +284,6 @@ sprintf("Total apps %d, removing na", rows_without_na)
 
 
 
-## Data wrangling
 
-Let's clean up our data.
-
-
-
-## NAs
-
-Let's take a look at those features that contains NAs
-
-```{r}
-colnames(apps_dataset)[colSums(is.na(apps_dataset)) > 0]
-```
-
-Let's confirm how many observations there are with NA
-
-We see Rating column is numeric
-```{r}
-class(apps_dataset$Rating)
-```
-
-Therefore those recods are missing, it may be due to:
-
-    * They are new and there are no yet any rating.
-    * There may be a new version with no ratings yet.
-    * Messing value
-    * It may be around for a while and it has no download (or almost none)
-    
-
-```{r}
-apps_without_ratings <-  apps_dataset %>% 
-  filter(is.na(Rating)) %>%
-  nrow()
-
-sprintf("There are %d without ratings", apps_without_ratings)
-```
-
-Let's see if they must be considered, or at least which ones...
-
-
-```{r}
-newest_app_date <- apps_dataset %>%  select(Last.Updated) 
-class(newest_app_date$Last.Updated)
-head(newest_app_date)
-```
 
 
