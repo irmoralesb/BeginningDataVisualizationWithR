@@ -17,7 +17,9 @@ library(ggplot2)
 library(lattice)
 library(latticeExtra)
 library(lubridate)
+library(dslabs)
 
+ds_theme_set()
 apps_dataset_original = read.csv("../../data/googleplaystore.csv", header = TRUE, sep = ",")
 
 #class(apps_dataset)
@@ -102,12 +104,136 @@ sprintf("There are %d without ratings", apps_without_ratings)
 
 **So far we are going to keep the observations that no contains ratings**
 
+Let's explore the Ratings... we are going to convert them in categorical data to see the values easily
+
+``` r
+apps_dataset_original %>% 
+  mutate(RatingTemp = round(Rating)) %>%
+  filter(!is.na(RatingTemp)) %>%
+  select(Rating, RatingTemp) %>%
+  group_by(RatingTemp) %>%
+  summarize()
+```
+
+    ## # A tibble: 6 x 1
+    ##   RatingTemp
+    ##        <dbl>
+    ## 1          1
+    ## 2          2
+    ## 3          3
+    ## 4          4
+    ## 5          5
+    ## 6         19
+
+We found that there are **Ratings of 19!!!** this is not expected
+
+Let take a closer look
+
+``` r
+apps_dataset_original %>%
+  mutate(RatingTemp = round(Rating)) %>%
+  group_by(RatingTemp) %>%
+  summarize(count = n())
+```
+
+    ## # A tibble: 7 x 2
+    ##   RatingTemp count
+    ##        <dbl> <int>
+    ## 1          1    20
+    ## 2          2   130
+    ## 3          3   583
+    ## 4          4  6716
+    ## 5          5  1917
+    ## 6         19     1
+    ## 7        NaN  1474
+
+Validating if there are more Ratings out of range
+
+``` r
+apps_dataset_original %>% 
+  filter(Rating > 5.0 | Rating < 0) %>%
+  count()
+```
+
+    ## # A tibble: 1 x 1
+    ##       n
+    ##   <int>
+    ## 1     1
+
+**There is only one app with Rating 19, it may be 1.9, I am taking the decision of changing the value to 1.9**
+
+``` r
+apps_dataset <- apps_dataset_original
+head(as.tibble(apps_dataset$Rating))
+```
+
+    ## # A tibble: 6 x 1
+    ##   value
+    ##   <dbl>
+    ## 1   4.1
+    ## 2   3.9
+    ## 3   4.7
+    ## 4   4.5
+    ## 5   4.3
+    ## 6   4.4
+
+``` r
+rating_indexes <- !is.na(apps_dataset[,3]) & apps_dataset[,3] > 5.0
+
+apps_dataset[rating_indexes,3] <- apps_dataset[rating_indexes,3] * 0.1
+```
+
+Validating the change has been applied
+
+``` r
+apps_dataset %>%
+  mutate(RatingTemp = round(Rating)) %>%
+  group_by(RatingTemp) %>%
+  summarize(count = n())
+```
+
+    ## # A tibble: 6 x 2
+    ##   RatingTemp count
+    ##        <dbl> <int>
+    ## 1          1    20
+    ## 2          2   131
+    ## 3          3   583
+    ## 4          4  6716
+    ## 5          5  1917
+    ## 6        NaN  1474
+
+``` r
+apps_dataset %>%
+  ggplot(aes(x= Rating))+
+  coord_cartesian(xlim = c(0,6)) +
+  geom_histogram(bins=5) + 
+  ggtitle("Rating distribution")
+```
+
+    ## Warning: Removed 1474 rows containing non-finite values (stat_bin).
+
+![](GooglePlayApps_files/figure-markdown_github/unnamed-chunk-11-1.png)
+
+Taking a look at the proportion between those that don't have Ratings
+
+``` r
+apps_dataset %>% 
+  mutate(HasRating = !is.na(Rating)) %>%
+  ggplot(aes(x ="", fill = HasRating)) +
+  geom_bar() +
+  coord_polar(theta = "y") +
+  ggtitle("Proportion of Apps with Rating") +
+  ylab("")
+```
+
+![](GooglePlayApps_files/figure-markdown_github/unnamed-chunk-12-1.png)
+
 ### Reviews Feature
 
 We see this feature is set as factor when it must be numeric
 
 ``` r
-apps_dataset_original %>%
+apps_dataset %>%
   filter(is.na(as.numeric(Reviews))) %>%
   select(App)
 ```
@@ -118,7 +244,7 @@ apps_dataset_original %>%
 So, Reviews contains only numeric entries, so we convert those explicit
 
 ``` r
-apps_dataset <-  apps_dataset_original %>% 
+apps_dataset <-  apps_dataset %>% 
   mutate(Reviews = as.numeric(Reviews))
 
 head(as.tibble(apps_dataset))
@@ -371,12 +497,6 @@ head(as.tibble(apps_dataset$Last.UpdatedDate))
     ## 4 2018-06-08
     ## 5 2018-06-20
     ## 6 2017-03-26
-
-############################################################ 
-
-trump\_tweets &lt;- map(2009:2017, ~sprintf(url, .x)) %&gt;% map\_df(jsonlite::fromJSON, simplifyDataFrame = TRUE) %&gt;% filter(!is\_retweet & !str\_detect(text, '^"')) %&gt;% mutate(created\_at = parse\_date\_time(created\_at, orders = "a b! d! H!:M!:S! z!\* Y!", tz="EST"))
-
-############################################################ 
 
 Record Counting
 ---------------

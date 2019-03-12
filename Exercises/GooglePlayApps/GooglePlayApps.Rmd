@@ -18,7 +18,9 @@ library(ggplot2)
 library(lattice)
 library(latticeExtra)
 library(lubridate)
+library(dslabs)
 
+ds_theme_set()
 apps_dataset_original = read.csv("../../data/googleplaystore.csv", header = TRUE, sep = ",")
 
 #class(apps_dataset)
@@ -75,18 +77,96 @@ sprintf("There are %d without ratings", apps_without_ratings)
 **So far we are going to keep the observations that no contains ratings**
 
 
+Let's explore the Ratings... we are going to convert them in categorical data to see the values easily
+
+
+```{r}
+apps_dataset_original %>% 
+  mutate(RatingTemp = round(Rating)) %>%
+  filter(!is.na(RatingTemp)) %>%
+  select(Rating, RatingTemp) %>%
+  group_by(RatingTemp) %>%
+  summarize()
+```
+
+We found that there are **Ratings of 19!!!** this is not expected
+
+Let take a closer look
+
+```{r}
+apps_dataset_original %>%
+  mutate(RatingTemp = round(Rating)) %>%
+  group_by(RatingTemp) %>%
+  summarize(count = n())
+```
+
+Validating if there are more Ratings out of range
+```{r}
+apps_dataset_original %>% 
+  filter(Rating > 5.0 | Rating < 0) %>%
+  count()
+```
+
+
+**There is only one app with Rating 19, it may be 1.9, I am taking the decision of changing the value to 1.9**
+
+```{r}
+apps_dataset <- apps_dataset_original
+head(as.tibble(apps_dataset$Rating))
+
+rating_indexes <- !is.na(apps_dataset[,3]) & apps_dataset[,3] > 5.0
+
+apps_dataset[rating_indexes,3] <- apps_dataset[rating_indexes,3] * 0.1
+
+
+```
+
+Validating the change has been applied
+
+```{r}
+apps_dataset %>%
+  mutate(RatingTemp = round(Rating)) %>%
+  group_by(RatingTemp) %>%
+  summarize(count = n())
+```
+
+
+```{r}
+apps_dataset %>%
+  ggplot(aes(x= Rating))+
+  coord_cartesian(xlim = c(0,6)) +
+  geom_histogram(bins=5) + 
+  ggtitle("Rating distribution")
+```
+
+
+Taking a look at the proportion between those that don't have Ratings
+
+```{r}
+apps_dataset %>% 
+  mutate(HasRating = !is.na(Rating)) %>%
+  ggplot(aes(x ="", fill = HasRating)) +
+  geom_bar() +
+  coord_polar(theta = "y") +
+  ggtitle("Proportion of Apps with Rating") +
+  ylab("")
+  
+  
+```
+
+
 ### Reviews Feature
 
 We see this feature is set as factor when it must be numeric
 ```{r}
-apps_dataset_original %>%
+apps_dataset %>%
   filter(is.na(as.numeric(Reviews))) %>%
   select(App)
 ```
 So, Reviews contains only numeric entries, so we convert those explicit
 
 ```{r}
-apps_dataset <-  apps_dataset_original %>% 
+apps_dataset <-  apps_dataset %>% 
   mutate(Reviews = as.numeric(Reviews))
 
 head(as.tibble(apps_dataset))
@@ -99,6 +179,15 @@ na_counter <-sum(is.na(apps_dataset[,4]))
 sprintf("There are %d Reviews with NA", na_counter)
 ```
 So we are done with this feature.
+
+```{r}
+apps_dataset %>%
+  group_by(Category) %>%
+  summarize(count = n(), max = max(Reviews), min = min(Reviews))
+
+```
+
+
 
 ### Size Feature
 
