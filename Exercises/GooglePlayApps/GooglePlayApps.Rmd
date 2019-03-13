@@ -149,9 +149,10 @@ apps_dataset %>%
   geom_bar() +
   coord_polar(theta = "y") +
   ggtitle("Proportion of Apps with Rating") +
-  ylab("")
-  
-  
+  ylab("") +
+  xlab("") +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
 ```
 
 
@@ -185,6 +186,28 @@ apps_dataset %>%
   group_by(Category) %>%
   summarize(count = n(), max = max(Reviews), min = min(Reviews))
 
+```
+
+```{r}
+max_value <- max(apps_dataset$Reviews)
+min_value <- min(apps_dataset$Reviews)
+sprintf("Max value %d, Min value %d", max_value, min_value)
+  
+```
+
+Let's take a quick view to the current data, sowe may seeany unexpected value
+
+```{r}
+apps_dataset %>%
+  ggplot(aes(x = Reviews, y = Reviews)) +
+  geom_boxplot() +
+  ggtitle("Review Distribution") +
+  xlab("") +
+  ylab("Number of Reviews") +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank()
+  )
 ```
 
 
@@ -228,22 +251,52 @@ So We have detected that also k is added to the app size measurement, the observ
 #### Create new Size column with the numeric type only
 
 ```{r}
-pattern = "([Mk])"
 apps_dataset <- apps_dataset %>%
-  mutate(SizeNumeric = str_replace(as.character(Size), "Varies with device", "")) %>%
-  mutate(SizeNumeric = str_replace(SizeNumeric,pattern = pattern , "")) %>%
-  mutate(SizeNumeric = as.numeric(SizeNumeric)) %>%
-  filter(!is.na(SizeNumeric)) 
-
-# There are only numeric values
-apps_dataset %>%
-  #filter(!is.numeric(SizeNumeric)) %>%
-  filter(is.na(SizeNumeric)) %>%  
-  select(Size, SizeNumeric) %>% 
-  count()
-  
+  mutate(SizeNumeric = case_when(
+    !is.na(Size) & str_detect(Size,"M$") ~ as.numeric(str_replace(Size,"M$","")),
+    !is.na(Size) & str_detect(Size,"k$") ~  round(as.numeric(str_replace(Size,"k$",""))/1024,3),
+    Size == "Varies with device" ~ mean(NA),
+    TRUE ~ as.numeric(NA)
+  ))
 
 ```
+
+We may consider to set the average size for those apps set as "Varies with device"... let's see what is the proportion.
+
+```{r}
+proportion_of_size <- sum(str_detect(apps_dataset$Size,"^Varies with device$"))/nrow(apps_dataset)
+sprintf("Proportion of Size set as 'Varies with device': %f", proportion_of_size)
+```
+**This is the 15.6%, it is too high... I am going to fill it with the mean anyway, depeding on the analysis I may change the mean to match the mean per app category** 
+
+
+
+
+```{r}
+size_summary <-  apps_dataset %>% 
+  filter(!str_detect(Size, "^Varies with device$")) %>%
+  group_by(Category) %>%
+  select(Category, SizeNumeric) %>%
+  summarize(Mean=round(mean(SizeNumeric),3))
+
+
+text_temp <-  size_summary$Mean[str_detect(size_summary$Category,"ART_AND_DESIGN")]
+class(apps_dataset$CategoryTemp)
+text_temp
+
+apps_dataset <- apps_dataset %>%
+  mutate(CategoryTemp = as.character(Category)) %>%
+   mutate(SizeNumeric = case_when(
+       str_detect(Size,"^Varies with device$") ~ size_summary$Mean[str_detect(size_summary$Category,CategoryTemp)],
+       TRUE ~ SizeNumeric))
+# 
+# # Validating
+# apps_dataset %>%
+#   filter(str_detect(Size,"^Varies with device$")) %>%
+#   select(Size, SizeNumeric) %>%
+#   head()
+```
+
 
 ### Install feature
 
