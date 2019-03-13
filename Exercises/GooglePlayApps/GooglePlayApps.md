@@ -29,13 +29,13 @@ head(as.tibble(apps_dataset_original))
     ## # A tibble: 6 x 13
     ##   App   Category Rating Reviews Size  Installs Type  Price Content.Rating
     ##   <fct> <fct>     <dbl> <fct>   <fct> <fct>    <fct> <fct> <fct>         
-    ## 1 Phot~ ART_AND~    4.1 159     19M   10,000+  Free  0     Everyone      
-    ## 2 Colo~ ART_AND~    3.9 967     14M   500,000+ Free  0     Everyone      
-    ## 3 U La~ ART_AND~    4.7 87510   8.7M  5,000,0~ Free  0     Everyone      
-    ## 4 Sket~ ART_AND~    4.5 215644  25M   50,000,~ Free  0     Teen          
-    ## 5 Pixe~ ART_AND~    4.3 967     2.8M  100,000+ Free  0     Everyone      
-    ## 6 Pape~ ART_AND~    4.4 167     5.6M  50,000+  Free  0     Everyone      
-    ## # ... with 4 more variables: Genres <fct>, Last.Updated <fct>,
+    ## 1 Phot… ART_AND…    4.1 159     19M   10,000+  Free  0     Everyone      
+    ## 2 Colo… ART_AND…    3.9 967     14M   500,000+ Free  0     Everyone      
+    ## 3 U La… ART_AND…    4.7 87510   8.7M  5,000,0… Free  0     Everyone      
+    ## 4 Sket… ART_AND…    4.5 215644  25M   50,000,… Free  0     Teen          
+    ## 5 Pixe… ART_AND…    4.3 967     2.8M  100,000+ Free  0     Everyone      
+    ## 6 Pape… ART_AND…    4.4 167     5.6M  50,000+  Free  0     Everyone      
+    ## # … with 4 more variables: Genres <fct>, Last.Updated <fct>,
     ## #   Current.Ver <fct>, Android.Ver <fct>
 
 Data wrangling
@@ -56,13 +56,13 @@ head(as.tibble(apps_dataset_original))
     ## # A tibble: 6 x 13
     ##   App   Category Rating Reviews Size  Installs Type  Price Content.Rating
     ##   <chr> <fct>     <dbl> <fct>   <fct> <fct>    <fct> <fct> <fct>         
-    ## 1 Phot~ ART_AND~    4.1 159     19M   10,000+  Free  0     Everyone      
-    ## 2 Colo~ ART_AND~    3.9 967     14M   500,000+ Free  0     Everyone      
-    ## 3 U La~ ART_AND~    4.7 87510   8.7M  5,000,0~ Free  0     Everyone      
-    ## 4 Sket~ ART_AND~    4.5 215644  25M   50,000,~ Free  0     Teen          
-    ## 5 Pixe~ ART_AND~    4.3 967     2.8M  100,000+ Free  0     Everyone      
-    ## 6 Pape~ ART_AND~    4.4 167     5.6M  50,000+  Free  0     Everyone      
-    ## # ... with 4 more variables: Genres <fct>, Last.Updated <fct>,
+    ## 1 Phot… ART_AND…    4.1 159     19M   10,000+  Free  0     Everyone      
+    ## 2 Colo… ART_AND…    3.9 967     14M   500,000+ Free  0     Everyone      
+    ## 3 U La… ART_AND…    4.7 87510   8.7M  5,000,0… Free  0     Everyone      
+    ## 4 Sket… ART_AND…    4.5 215644  25M   50,000,… Free  0     Teen          
+    ## 5 Pixe… ART_AND…    4.3 967     2.8M  100,000+ Free  0     Everyone      
+    ## 6 Pape… ART_AND…    4.4 167     5.6M  50,000+  Free  0     Everyone      
+    ## # … with 4 more variables: Genres <fct>, Last.Updated <fct>,
     ## #   Current.Ver <fct>, Android.Ver <fct>
 
 ### Rating feature
@@ -223,7 +223,10 @@ apps_dataset %>%
   geom_bar() +
   coord_polar(theta = "y") +
   ggtitle("Proportion of Apps with Rating") +
-  ylab("")
+  ylab("") +
+  xlab("") +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
 ```
 
 ![](GooglePlayApps_files/figure-markdown_github/unnamed-chunk-12-1.png)
@@ -253,13 +256,13 @@ head(as.tibble(apps_dataset))
     ## # A tibble: 6 x 13
     ##   App   Category Rating Reviews Size  Installs Type  Price Content.Rating
     ##   <chr> <fct>     <dbl>   <dbl> <fct> <fct>    <fct> <fct> <fct>         
-    ## 1 Phot~ ART_AND~    4.1    1183 19M   10,000+  Free  0     Everyone      
-    ## 2 Colo~ ART_AND~    3.9    5924 14M   500,000+ Free  0     Everyone      
-    ## 3 U La~ ART_AND~    4.7    5681 8.7M  5,000,0~ Free  0     Everyone      
-    ## 4 Sket~ ART_AND~    4.5    1947 25M   50,000,~ Free  0     Teen          
-    ## 5 Pixe~ ART_AND~    4.3    5924 2.8M  100,000+ Free  0     Everyone      
-    ## 6 Pape~ ART_AND~    4.4    1310 5.6M  50,000+  Free  0     Everyone      
-    ## # ... with 4 more variables: Genres <fct>, Last.Updated <fct>,
+    ## 1 Phot… ART_AND…    4.1    1183 19M   10,000+  Free  0     Everyone      
+    ## 2 Colo… ART_AND…    3.9    5924 14M   500,000+ Free  0     Everyone      
+    ## 3 U La… ART_AND…    4.7    5681 8.7M  5,000,0… Free  0     Everyone      
+    ## 4 Sket… ART_AND…    4.5    1947 25M   50,000,… Free  0     Teen          
+    ## 5 Pixe… ART_AND…    4.3    5924 2.8M  100,000+ Free  0     Everyone      
+    ## 6 Pape… ART_AND…    4.4    1310 5.6M  50,000+  Free  0     Everyone      
+    ## # … with 4 more variables: Genres <fct>, Last.Updated <fct>,
     ## #   Current.Ver <fct>, Android.Ver <fct>
 
 The Reviews feature is now numeric, let's check if there are NAs
@@ -272,6 +275,54 @@ sprintf("There are %d Reviews with NA", na_counter)
     ## [1] "There are 0 Reviews with NA"
 
 So we are done with this feature.
+
+``` r
+apps_dataset %>%
+  group_by(Category) %>%
+  summarize(count = n(), max = max(Reviews), min = min(Reviews))
+```
+
+    ## # A tibble: 34 x 4
+    ##    Category            count   max   min
+    ##    <fct>               <int> <dbl> <dbl>
+    ##  1 1.9                     1  2856  2856
+    ##  2 ART_AND_DESIGN         65  5924     1
+    ##  3 AUTO_AND_VEHICLES      85  5988     1
+    ##  4 BEAUTY                 53  5914     1
+    ##  5 BOOKS_AND_REFERENCE   231  5947     1
+    ##  6 BUSINESS              460  5954     1
+    ##  7 COMICS                 60  5994     2
+    ##  8 COMMUNICATION         387  5995     1
+    ##  9 DATING                234  5940     1
+    ## 10 EDUCATION             156  5979   166
+    ## # … with 24 more rows
+
+``` r
+max_value <- max(apps_dataset$Reviews)
+min_value <- min(apps_dataset$Reviews)
+sprintf("Max value %d, Min value %d", max_value, min_value)
+```
+
+    ## [1] "Max value 6002, Min value 1"
+
+Let's take a quick view to the current data, sowe may seeany unexpected value
+
+``` r
+apps_dataset %>%
+  ggplot(aes(x = Reviews, y = Reviews)) +
+  geom_boxplot() +
+  ggtitle("Review Distribution") +
+  xlab("") +
+  ylab("Number of Reviews") +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank()
+  )
+```
+
+    ## Warning: Continuous x aesthetic -- did you forget aes(group=...)?
+
+![](GooglePlayApps_files/figure-markdown_github/unnamed-chunk-18-1.png)
 
 ### Size Feature
 
@@ -305,6 +356,9 @@ apps_dataset %>% filter(str_detect(Size, pattern = pattern) & Size != 'Varies wi
   summary()
 ```
 
+    ## Warning: Factor `Size` contains implicit NA, consider using
+    ## `forcats::fct_explicit_na`
+
     ##      App                 Size  
     ##  Length:0           1,000+ :0  
     ##  Class :character   1.0M   :0  
@@ -319,30 +373,62 @@ So We have detected that also k is added to the app size measurement, the observ
 #### Create new Size column with the numeric type only
 
 ``` r
-pattern = "([Mk])"
 apps_dataset <- apps_dataset %>%
-  mutate(SizeNumeric = str_replace(as.character(Size), "Varies with device", "")) %>%
-  mutate(SizeNumeric = str_replace(SizeNumeric,pattern = pattern , "")) %>%
-  mutate(SizeNumeric = as.numeric(SizeNumeric)) %>%
-  filter(!is.na(SizeNumeric)) 
+  mutate(SizeNumeric = case_when(
+    !is.na(Size) & str_detect(Size,"M$") ~ as.numeric(str_replace(Size,"M$","")),
+    !is.na(Size) & str_detect(Size,"k$") ~  round(as.numeric(str_replace(Size,"k$",""))/1024,3),
+    Size == "Varies with device" ~ mean(NA),
+    TRUE ~ as.numeric(NA)
+  ))
 ```
 
-    ## Warning in evalq(as.numeric(SizeNumeric), <environment>): NAs introduced by
+    ## Warning in eval_tidy(pair$rhs, env = default_env): NAs introduced by
     ## coercion
 
+    ## Warning in eval_tidy(pair$rhs, env = default_env): NAs introduced by
+    ## coercion
+
+We may consider to set the average size for those apps set as "Varies with device"... let's see what is the proportion.
+
 ``` r
-# There are only numeric values
-apps_dataset %>%
-  #filter(!is.numeric(SizeNumeric)) %>%
-  filter(is.na(SizeNumeric)) %>%  
-  select(Size, SizeNumeric) %>% 
-  count()
+proportion_of_size <- sum(str_detect(apps_dataset$Size,"^Varies with device$"))/nrow(apps_dataset)
+sprintf("Proportion of Size set as 'Varies with device': %f", proportion_of_size)
 ```
 
-    ## # A tibble: 1 x 1
-    ##       n
-    ##   <int>
-    ## 1     0
+    ## [1] "Proportion of Size set as 'Varies with device': 0.156351"
+
+**This is the 15.6%, it is too high... I am going to fill out it with the mean according to its category**
+
+``` r
+size_summary <-  apps_dataset %>% 
+  filter(!str_detect(Size, "^Varies with device$")) %>%
+  group_by(Category) %>%
+  select(Category, SizeNumeric) %>%
+  summarize(Mean=round(mean(SizeNumeric),3))
+
+apps_dataset <- apps_dataset %>%
+  group_by(Category) %>%
+  mutate(SizeNumeric = case_when(
+    is.na(SizeNumeric) ~ mean(SizeNumeric[!is.na(SizeNumeric)]),
+    TRUE ~ SizeNumeric)) %>%
+  ungroup()
+  
+# Validating
+apps_dataset %>%
+  filter(str_detect(Size,"^Varies with device$")) %>%
+  select(Size, SizeNumeric) %>%
+  head()
+```
+
+    ## # A tibble: 6 x 2
+    ##   Size               SizeNumeric
+    ##   <fct>                    <dbl>
+    ## 1 Varies with device        12.4
+    ## 2 Varies with device        12.4
+    ## 3 Varies with device        20.0
+    ## 4 Varies with device        20.0
+    ## 5 Varies with device        20.0
+    ## 6 Varies with device        20.0
 
 ### Install feature
 
@@ -354,6 +440,11 @@ we need to remove: **",","+" **
 apps_dataset <- apps_dataset %>% 
   mutate(InstallsNumeric = str_replace_all(Installs, "[,*+$]", "")) %>%
   mutate(InstallsNumeric = as.numeric(InstallsNumeric))
+```
+
+    ## Warning: NAs introduced by coercion
+
+``` r
   #select(Installs, InstallsNumeric) %>% 
   #head(n = 20)
 na_counter <- apps_dataset %>% 
@@ -363,7 +454,7 @@ na_counter <- apps_dataset %>%
 sprintf("There are %d NAs", sum(na_counter))
 ```
 
-    ## [1] "There are 0 NAs"
+    ## [1] "There are 1 NAs"
 
 ### Price feature
 
@@ -376,6 +467,9 @@ apps_dataset %>%
   select(Type) %>%
   summary()
 ```
+
+    ## Warning: Factor `Type` contains implicit NA, consider using
+    ## `forcats::fct_explicit_na`
 
     ##    Type  
     ##  0   :0  
@@ -394,13 +488,15 @@ apps_dataset %>%
   head()
 ```
 
+    ## # A tibble: 6 x 1
     ##   Price
+    ##   <fct>
     ## 1 $4.99
     ## 2 $4.99
     ## 3 $4.99
     ## 4 $4.99
-    ## 5 $6.99
-    ## 6 $1.49
+    ## 5 $3.99
+    ## 6 $3.99
 
 There are format characters, so we need to clean up
 
@@ -431,7 +527,7 @@ apps_dataset %>%  filter(Type != 'Free' & Price == '0') %>% count()
     ## # A tibble: 1 x 1
     ##       n
     ##   <int>
-    ## 1     0
+    ## 1     1
 
 **Also there is none**
 
@@ -446,7 +542,7 @@ apps_dataset %>%
     ## # A tibble: 1 x 1
     ##       n
     ##   <int>
-    ## 1     0
+    ## 1     1
 
 Let's check what is the max and min prices (for min we are expecting 0)
 
@@ -460,9 +556,10 @@ apps_dataset %>%
     ##  Min.   :  0.000  
     ##  1st Qu.:  0.000  
     ##  Median :  0.000  
-    ##  Mean   :  1.184  
+    ##  Mean   :  1.027  
     ##  3rd Qu.:  0.000  
-    ##  Max.   :400.000
+    ##  Max.   :400.000  
+    ##  NA's   :1
 
 ### Last updated feature
 
@@ -477,14 +574,18 @@ match_counter <- apps_dataset %>% filter(str_detect(as.character(Last.Updated), 
 sprintf("Matching %d of %d", sum(match_counter), nrow(apps_dataset))
 ```
 
-    ## [1] "Matching 9145 of 9145"
+    ## [1] "Matching 10840 of 10841"
 
 So all dates seem to be in the same format, so we can convert.
 
 ``` r
 apps_dataset <- apps_dataset %>%
   mutate(Last.UpdatedDate = mdy(Last.Updated))
+```
 
+    ## Warning: 1 failed to parse.
+
+``` r
 head(as.tibble(apps_dataset$Last.UpdatedDate))
 ```
 
@@ -510,10 +611,10 @@ rows_without_na <- nrow(na.omit(apps_dataset))
 sprintf("Total apps %d", rows_total)
 ```
 
-    ## [1] "Total apps 9145"
+    ## [1] "Total apps 10841"
 
 ``` r
 sprintf("Total apps %d, removing na", rows_without_na)
 ```
 
-    ## [1] "Total apps 7729, removing na"
+    ## [1] "Total apps 9366, removing na"

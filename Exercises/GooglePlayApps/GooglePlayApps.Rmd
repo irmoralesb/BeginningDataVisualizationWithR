@@ -267,10 +267,8 @@ We may consider to set the average size for those apps set as "Varies with devic
 proportion_of_size <- sum(str_detect(apps_dataset$Size,"^Varies with device$"))/nrow(apps_dataset)
 sprintf("Proportion of Size set as 'Varies with device': %f", proportion_of_size)
 ```
-**This is the 15.6%, it is too high... I am going to fill it with the mean anyway, depeding on the analysis I may change the mean to match the mean per app category** 
 
-
-
+**This is the 15.6%, it is too high... I am going to fill out it with the mean according to its category** 
 
 ```{r}
 size_summary <-  apps_dataset %>% 
@@ -279,22 +277,18 @@ size_summary <-  apps_dataset %>%
   select(Category, SizeNumeric) %>%
   summarize(Mean=round(mean(SizeNumeric),3))
 
-
-text_temp <-  size_summary$Mean[str_detect(size_summary$Category,"ART_AND_DESIGN")]
-class(apps_dataset$CategoryTemp)
-text_temp
-
 apps_dataset <- apps_dataset %>%
-  mutate(CategoryTemp = as.character(Category)) %>%
-   mutate(SizeNumeric = case_when(
-       str_detect(Size,"^Varies with device$") ~ size_summary$Mean[str_detect(size_summary$Category,CategoryTemp)],
-       TRUE ~ SizeNumeric))
-# 
-# # Validating
-# apps_dataset %>%
-#   filter(str_detect(Size,"^Varies with device$")) %>%
-#   select(Size, SizeNumeric) %>%
-#   head()
+  group_by(Category) %>%
+  mutate(SizeNumeric = case_when(
+    is.na(SizeNumeric) ~ mean(SizeNumeric[!is.na(SizeNumeric)]),
+    TRUE ~ SizeNumeric)) %>%
+  ungroup()
+  
+# Validating
+apps_dataset %>%
+  filter(str_detect(Size,"^Varies with device$")) %>%
+  select(Size, SizeNumeric) %>%
+  head()
 ```
 
 
