@@ -31,6 +31,7 @@ head(as.tibble(apps_dataset_original))
 ## Data wrangling
 Let's confirm the column types are correct and also the values.  
 
+
 ### App Feature
 
 From previous point, we can see the App column, which contains app names, is factor data type, we need to change it to character.
@@ -39,6 +40,58 @@ From previous point, we can see the App column, which contains app names, is fac
 apps_dataset_original = read.csv("../../data/googleplaystore.csv", header = TRUE, sep = ",", as.is = c("App"))
 
 head(as.tibble(apps_dataset_original))
+```
+
+
+### Incorrect record
+
+In a later analysis has been detected a broken record, but since this affects to the rest of conversions has been moved into this first steps.
+
+```{r}
+apps_dataset_original %>%
+  filter(Category == "1.9") %>%
+  head()  
+```
+
+So we can see the Category feature is missing, and the rest of the values are shift to the left, so we can fix it, and the best option is to do it from the begining. So we need to find the best category, based on the app name.
+
+```{r}
+apps_dataset_original %>% 
+  filter(str_detect(App,"photo")) %>%
+  select(Category) %>%
+  head()
+```
+
+"PHOTOGRAPHY" category seems to be the most properly for this app
+```{r}
+col_number <- ncol(apps_dataset_original)
+rows_indx <- apps_dataset_original[,1] == "Life Made WI-Fi Touchscreen Photo Frame"
+apps_dataset_original[rows_indx,3:col_number]  <- apps_dataset_original[rows_indx,2:(col_number-1)]
+apps_dataset_original[rows_indx,2] <- "PHOTOGRAPHY"
+
+apps_dataset_original %>%
+  filter(App == "Life Made WI-Fi Touchscreen Photo Frame") %>%
+  head()  
+
+  
+```
+
+Now Genres feature has NA,let's see if we can set any that makes sense
+
+```{r}
+apps_dataset_original %>% filter(Category == "PHOTOGRAPHY")%>% select(Genres) %>% distinct(Genres)
+```
+
+So for Category = "PHOTOGRAPHY" we must set Genres = "Photography"
+
+```{r}
+apps_dataset_original[rows_indx,10] <- "Photography"
+apps_dataset_original[rows_indx,3] <- 1.9
+apps_dataset_original %>%
+  filter(App == "Life Made WI-Fi Touchscreen Photo Frame") %>%
+  head()  
+#levels(apps_dataset_original$Genres)
+
 ```
 
 
@@ -195,7 +248,7 @@ sprintf("Max value %d, Min value %d", max_value, min_value)
   
 ```
 
-Let's take a quick view to the current data, sowe may seeany unexpected value
+Let's take a quick view to the current data, sowe may see any unexpected value
 
 ```{r}
 apps_dataset %>%
@@ -287,10 +340,26 @@ apps_dataset <- apps_dataset %>%
 # Validating
 apps_dataset %>%
   filter(str_detect(Size,"^Varies with device$")) %>%
-  select(Size, SizeNumeric) %>%
-  head()
+  group_by(Category) %>%
+  select(Category,Size, SizeNumeric) %>%
+  head(n=10)
 ```
 
+Now let's see the current data
+
+```{r}
+apps_dataset %>% 
+  ggplot(aes(x = SizeNumeric, y = SizeNumeric)) +
+  geom_boxplot() +
+  ggtitle("Distribution of App Size") +
+  xlab("") +
+  ylab("App Size (MB)")
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank())
+```
+
+**At first sight all app sizes seem to be ok, it is expeted to have some few very big apps.**
 
 ### Install feature
 
@@ -299,18 +368,54 @@ We may need to keep it as factor, but we also will need it as numeric, so we are
 we need to remove: **",","+" **
     
 ```{r}
+options(scipen = 999) # Disabling scientific notation
 apps_dataset <- apps_dataset %>% 
   mutate(InstallsNumeric = str_replace_all(Installs, "[,*+$]", "")) %>%
-  mutate(InstallsNumeric = as.numeric(InstallsNumeric))
-  #select(Installs, InstallsNumeric) %>% 
-  #head(n = 20)
+  mutate(InstallsNumeric = as.integer(InstallsNumeric))
+
 na_counter <- apps_dataset %>% 
     filter(is.na(InstallsNumeric)) %>%
     count()
 
 sprintf("There are %d NAs", sum(na_counter))
-  
+summary(apps_dataset$InstallsNumeric)
+
 ```
+
+There are no NA, it used to be due to the incorrect observation fixed at the beginning... But the current distribution is really odd
+
+```{r}
+
+apps_dataset %>% select(Installs,InstallsNumeric) %>% head()
+
+apps_dataset %>%
+  ggplot(aes(x=50, y = InstallsNumeric)) +
+  geom_boxplot() +
+  ggtitle("Install distribution") +
+  xlab("") +
+  ylab("Installations") +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank())
+```
+
+
+The outliers are really affecting our current box plot view...let remove those in order for usto be the main data.
+
+```{r}
+apps_dataset %>%
+  filter(InstallsNumeric <=1000000) %>%
+  ggplot(aes(x=50, y = InstallsNumeric)) +
+  geom_boxplot() +
+  ggtitle("Install distribution") +
+  xlab("") +
+  ylab("Installations") +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank())
+```
+
+After taking a comparisson between Installations and InstallationNumeric columns, we can see the numbers are correct, and the distribution is really long. We will analyse later in depth
 
 ### Price feature
 
@@ -358,7 +463,12 @@ apps_dataset %>%  filter(Type == 'Free' & Price != '0') %>% count()
 ```{r}
 apps_dataset %>%  filter(Type != 'Free' & Price == '0') %>% count()
 ```
-**Also there is none**
+**There is detected one incorrect Type observation, it was missing Free for price = 0**, so this is why the line below is there.
+
+
+```{r}
+apps_dataset %>%  filter(Type != 'Free' & Price == '0')
+```
 
 We didn't get any NA message when converting the Price column, but we are going to double check
 
@@ -376,6 +486,24 @@ apps_dataset %>%
   select(PriceNumeric) %>%
   summary(PriceNumeric) 
 ```
+
+### Type feature
+
+It has no specified the Type, so since the price is 0, we can assume the category is  Free
+
+```{r}
+apps_dataset %>%  filter(Type == 'NaN')
+
+```
+
+There is only one Type = "NaN", so we can fix it,since the Price = 0, we can set it Free.
+
+```{r}
+apps_dataset$Type[apps_dataset$Type == "NaN"] <- "Free"
+apps_dataset %>%  filter(Type == 'NaN' | App == "Command & Conquer: Rivals")
+```
+
+
 
 ### Last updated feature
 

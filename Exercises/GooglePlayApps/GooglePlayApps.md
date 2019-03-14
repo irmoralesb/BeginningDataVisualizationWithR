@@ -65,6 +65,97 @@ head(as.tibble(apps_dataset_original))
     ## # … with 4 more variables: Genres <fct>, Last.Updated <fct>,
     ## #   Current.Ver <fct>, Android.Ver <fct>
 
+### Incorrect record
+
+In a later analysis has been detected a broken record, but since this affects to the rest of conversions has been moved into this first steps.
+
+``` r
+apps_dataset_original %>%
+  filter(Category == "1.9") %>%
+  head()  
+```
+
+    ##                                       App Category Rating Reviews   Size
+    ## 1 Life Made WI-Fi Touchscreen Photo Frame      1.9     19    3.0M 1,000+
+    ##   Installs Type    Price Content.Rating            Genres Last.Updated
+    ## 1     Free    0 Everyone                February 11, 2018       1.0.19
+    ##   Current.Ver Android.Ver
+    ## 1  4.0 and up
+
+So we can see the Category feature is missing, and the rest of the values are shift to the left, so we can fix it, and the best option is to do it from the begining. So we need to find the best category, based on the app name.
+
+``` r
+apps_dataset_original %>% 
+  filter(str_detect(App,"photo")) %>%
+  select(Category) %>%
+  head()
+```
+
+    ##         Category
+    ## 1 ART_AND_DESIGN
+    ## 2         BEAUTY
+    ## 3         DATING
+    ## 4         EVENTS
+    ## 5    PHOTOGRAPHY
+    ## 6    PHOTOGRAPHY
+
+"PHOTOGRAPHY" category seems to be the most properly for this app
+
+``` r
+col_number <- ncol(apps_dataset_original)
+rows_indx <- apps_dataset_original[,1] == "Life Made WI-Fi Touchscreen Photo Frame"
+apps_dataset_original[rows_indx,3:col_number]  <- apps_dataset_original[rows_indx,2:(col_number-1)]
+```
+
+    ## Warning in `[<-.factor`(`*tmp*`, iseq, value = structure(1L, .Label =
+    ## c("", : invalid factor level, NA generated
+
+``` r
+apps_dataset_original[rows_indx,2] <- "PHOTOGRAPHY"
+
+apps_dataset_original %>%
+  filter(App == "Life Made WI-Fi Touchscreen Photo Frame") %>%
+  head()  
+```
+
+    ##                                       App    Category Rating Reviews Size
+    ## 1 Life Made WI-Fi Touchscreen Photo Frame PHOTOGRAPHY      1      19 3.0M
+    ##   Installs Type Price Content.Rating Genres      Last.Updated Current.Ver
+    ## 1   1,000+ Free     0       Everyone   <NA> February 11, 2018      1.0.19
+    ##   Android.Ver
+    ## 1  4.0 and up
+
+Now Genres feature has NA,let's see if we can set any that makes sense
+
+``` r
+apps_dataset_original %>% filter(Category == "PHOTOGRAPHY")%>% select(Genres) %>% distinct(Genres)
+```
+
+    ##        Genres
+    ## 1 Photography
+    ## 2        <NA>
+
+So for Category = "PHOTOGRAPHY" we must set Genres = "Photography"
+
+``` r
+apps_dataset_original[rows_indx,10] <- "Photography"
+apps_dataset_original[rows_indx,3] <- 1.9
+apps_dataset_original %>%
+  filter(App == "Life Made WI-Fi Touchscreen Photo Frame") %>%
+  head()  
+```
+
+    ##                                       App    Category Rating Reviews Size
+    ## 1 Life Made WI-Fi Touchscreen Photo Frame PHOTOGRAPHY    1.9      19 3.0M
+    ##   Installs Type Price Content.Rating      Genres      Last.Updated
+    ## 1   1,000+ Free     0       Everyone Photography February 11, 2018
+    ##   Current.Ver Android.Ver
+    ## 1      1.0.19  4.0 and up
+
+``` r
+#levels(apps_dataset_original$Genres)
+```
+
 ### Rating feature
 
 Let's take a look at those features that contains NAs
@@ -115,7 +206,7 @@ apps_dataset_original %>%
   summarize()
 ```
 
-    ## # A tibble: 6 x 1
+    ## # A tibble: 5 x 1
     ##   RatingTemp
     ##        <dbl>
     ## 1          1
@@ -123,7 +214,6 @@ apps_dataset_original %>%
     ## 3          3
     ## 4          4
     ## 5          5
-    ## 6         19
 
 We found that there are **Ratings of 19!!!** this is not expected
 
@@ -136,16 +226,15 @@ apps_dataset_original %>%
   summarize(count = n())
 ```
 
-    ## # A tibble: 7 x 2
+    ## # A tibble: 6 x 2
     ##   RatingTemp count
     ##        <dbl> <int>
     ## 1          1    20
-    ## 2          2   130
+    ## 2          2   131
     ## 3          3   583
     ## 4          4  6716
     ## 5          5  1917
-    ## 6         19     1
-    ## 7        NaN  1474
+    ## 6        NaN  1474
 
 Validating if there are more Ratings out of range
 
@@ -158,7 +247,7 @@ apps_dataset_original %>%
     ## # A tibble: 1 x 1
     ##       n
     ##   <int>
-    ## 1     1
+    ## 1     0
 
 **There is only one app with Rating 19, it may be 1.9, I am taking the decision of changing the value to 1.9**
 
@@ -212,7 +301,7 @@ apps_dataset %>%
 
     ## Warning: Removed 1474 rows containing non-finite values (stat_bin).
 
-![](GooglePlayApps_files/figure-markdown_github/unnamed-chunk-11-1.png)
+![](GooglePlayApps_files/figure-markdown_github/unnamed-chunk-16-1.png)
 
 Taking a look at the proportion between those that don't have Ratings
 
@@ -229,7 +318,7 @@ apps_dataset %>%
         axis.ticks.x = element_blank())
 ```
 
-![](GooglePlayApps_files/figure-markdown_github/unnamed-chunk-12-1.png)
+![](GooglePlayApps_files/figure-markdown_github/unnamed-chunk-17-1.png)
 
 ### Reviews Feature
 
@@ -282,20 +371,20 @@ apps_dataset %>%
   summarize(count = n(), max = max(Reviews), min = min(Reviews))
 ```
 
-    ## # A tibble: 34 x 4
+    ## # A tibble: 33 x 4
     ##    Category            count   max   min
     ##    <fct>               <int> <dbl> <dbl>
-    ##  1 1.9                     1  2856  2856
-    ##  2 ART_AND_DESIGN         65  5924     1
-    ##  3 AUTO_AND_VEHICLES      85  5988     1
-    ##  4 BEAUTY                 53  5914     1
-    ##  5 BOOKS_AND_REFERENCE   231  5947     1
-    ##  6 BUSINESS              460  5954     1
-    ##  7 COMICS                 60  5994     2
-    ##  8 COMMUNICATION         387  5995     1
-    ##  9 DATING                234  5940     1
-    ## 10 EDUCATION             156  5979   166
-    ## # … with 24 more rows
+    ##  1 ART_AND_DESIGN         65  5924     1
+    ##  2 AUTO_AND_VEHICLES      85  5988     1
+    ##  3 BEAUTY                 53  5914     1
+    ##  4 BOOKS_AND_REFERENCE   231  5947     1
+    ##  5 BUSINESS              460  5954     1
+    ##  6 COMICS                 60  5994     2
+    ##  7 COMMUNICATION         387  5995     1
+    ##  8 DATING                234  5940     1
+    ##  9 EDUCATION             156  5979   166
+    ## 10 ENTERTAINMENT         149  5989    85
+    ## # … with 23 more rows
 
 ``` r
 max_value <- max(apps_dataset$Reviews)
@@ -305,7 +394,7 @@ sprintf("Max value %d, Min value %d", max_value, min_value)
 
     ## [1] "Max value 6002, Min value 1"
 
-Let's take a quick view to the current data, sowe may seeany unexpected value
+Let's take a quick view to the current data, sowe may see any unexpected value
 
 ``` r
 apps_dataset %>%
@@ -322,7 +411,7 @@ apps_dataset %>%
 
     ## Warning: Continuous x aesthetic -- did you forget aes(group=...)?
 
-![](GooglePlayApps_files/figure-markdown_github/unnamed-chunk-18-1.png)
+![](GooglePlayApps_files/figure-markdown_github/unnamed-chunk-23-1.png)
 
 ### Size Feature
 
@@ -416,19 +505,57 @@ apps_dataset <- apps_dataset %>%
 # Validating
 apps_dataset %>%
   filter(str_detect(Size,"^Varies with device$")) %>%
-  select(Size, SizeNumeric) %>%
-  head()
+  group_by(Category) %>%
+  select(Category,Size, SizeNumeric) %>%
+  head(n=10)
 ```
 
-    ## # A tibble: 6 x 2
-    ##   Size               SizeNumeric
-    ##   <fct>                    <dbl>
-    ## 1 Varies with device        12.4
-    ## 2 Varies with device        12.4
-    ## 3 Varies with device        20.0
-    ## 4 Varies with device        20.0
-    ## 5 Varies with device        20.0
-    ## 6 Varies with device        20.0
+    ## # A tibble: 10 x 3
+    ## # Groups:   Category [2]
+    ##    Category          Size               SizeNumeric
+    ##    <fct>             <fct>                    <dbl>
+    ##  1 ART_AND_DESIGN    Varies with device        12.4
+    ##  2 ART_AND_DESIGN    Varies with device        12.4
+    ##  3 AUTO_AND_VEHICLES Varies with device        20.0
+    ##  4 AUTO_AND_VEHICLES Varies with device        20.0
+    ##  5 AUTO_AND_VEHICLES Varies with device        20.0
+    ##  6 AUTO_AND_VEHICLES Varies with device        20.0
+    ##  7 AUTO_AND_VEHICLES Varies with device        20.0
+    ##  8 AUTO_AND_VEHICLES Varies with device        20.0
+    ##  9 AUTO_AND_VEHICLES Varies with device        20.0
+    ## 10 AUTO_AND_VEHICLES Varies with device        20.0
+
+Now let's see the current data
+
+``` r
+apps_dataset %>% 
+  ggplot(aes(x = SizeNumeric, y = SizeNumeric)) +
+  geom_boxplot() +
+  ggtitle("Distribution of App Size") +
+  xlab("") +
+  ylab("App Size (MB)")
+```
+
+    ## Warning: Continuous x aesthetic -- did you forget aes(group=...)?
+
+![](GooglePlayApps_files/figure-markdown_github/unnamed-chunk-29-1.png)
+
+``` r
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank())
+```
+
+    ## List of 2
+    ##  $ axis.text.x : list()
+    ##   ..- attr(*, "class")= chr [1:2] "element_blank" "element"
+    ##  $ axis.ticks.x: list()
+    ##   ..- attr(*, "class")= chr [1:2] "element_blank" "element"
+    ##  - attr(*, "class")= chr [1:2] "theme" "gg"
+    ##  - attr(*, "complete")= logi FALSE
+    ##  - attr(*, "validate")= logi TRUE
+
+**At first sight all app sizes seem to be ok, it is expeted to have some few very big apps.**
 
 ### Install feature
 
@@ -437,16 +564,11 @@ We may need to keep it as factor, but we also will need it as numeric, so we are
 we need to remove: **",","+" **
 
 ``` r
+options(scipen = 999) # Disabling scientific notation
 apps_dataset <- apps_dataset %>% 
   mutate(InstallsNumeric = str_replace_all(Installs, "[,*+$]", "")) %>%
-  mutate(InstallsNumeric = as.numeric(InstallsNumeric))
-```
+  mutate(InstallsNumeric = as.integer(InstallsNumeric))
 
-    ## Warning: NAs introduced by coercion
-
-``` r
-  #select(Installs, InstallsNumeric) %>% 
-  #head(n = 20)
 na_counter <- apps_dataset %>% 
     filter(is.na(InstallsNumeric)) %>%
     count()
@@ -454,7 +576,63 @@ na_counter <- apps_dataset %>%
 sprintf("There are %d NAs", sum(na_counter))
 ```
 
-    ## [1] "There are 1 NAs"
+    ## [1] "There are 0 NAs"
+
+``` r
+summary(apps_dataset$InstallsNumeric)
+```
+
+    ##       Min.    1st Qu.     Median       Mean    3rd Qu.       Max. 
+    ##          0       1000     100000   15462913    5000000 1000000000
+
+There are no NA, it used to be due to the incorrect observation fixed at the beginning... But the current distribution is really odd
+
+``` r
+apps_dataset %>% select(Installs,InstallsNumeric) %>% head()
+```
+
+    ## # A tibble: 6 x 2
+    ##   Installs    InstallsNumeric
+    ##   <fct>                 <int>
+    ## 1 10,000+               10000
+    ## 2 500,000+             500000
+    ## 3 5,000,000+          5000000
+    ## 4 50,000,000+        50000000
+    ## 5 100,000+             100000
+    ## 6 50,000+               50000
+
+``` r
+apps_dataset %>%
+  ggplot(aes(x=50, y = InstallsNumeric)) +
+  geom_boxplot() +
+  ggtitle("Install distribution") +
+  xlab("") +
+  ylab("Installations") +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank())
+```
+
+![](GooglePlayApps_files/figure-markdown_github/unnamed-chunk-31-1.png)
+
+The outliers are really affecting our current box plot view...let remove those in order for usto be the main data.
+
+``` r
+apps_dataset %>%
+  filter(InstallsNumeric <=1000000) %>%
+  ggplot(aes(x=50, y = InstallsNumeric)) +
+  geom_boxplot() +
+  ggtitle("Install distribution") +
+  xlab("") +
+  ylab("Installations") +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank())
+```
+
+![](GooglePlayApps_files/figure-markdown_github/unnamed-chunk-32-1.png)
+
+After taking a comparisson between Installations and InstallationNumeric columns, we can see the numbers are correct, and the distribution is really long. We will analyse later in depth
 
 ### Price feature
 
@@ -529,7 +707,19 @@ apps_dataset %>%  filter(Type != 'Free' & Price == '0') %>% count()
     ##   <int>
     ## 1     1
 
-**Also there is none**
+**There is detected one incorrect Type observation, it was missing Free for price = 0**, so this is why the line below is there.
+
+``` r
+apps_dataset %>%  filter(Type != 'Free' & Price == '0')
+```
+
+    ## # A tibble: 1 x 16
+    ##   App   Category Rating Reviews Size  Installs Type  Price Content.Rating
+    ##   <chr> <fct>     <dbl>   <dbl> <fct> <fct>    <fct> <fct> <fct>         
+    ## 1 Comm… FAMILY      NaN       1 Vari… 0        NaN   0     Everyone 10+  
+    ## # … with 7 more variables: Genres <fct>, Last.Updated <fct>,
+    ## #   Current.Ver <fct>, Android.Ver <fct>, SizeNumeric <dbl>,
+    ## #   InstallsNumeric <int>, PriceNumeric <dbl>
 
 We didn't get any NA message when converting the Price column, but we are going to double check
 
@@ -542,7 +732,7 @@ apps_dataset %>%
     ## # A tibble: 1 x 1
     ##       n
     ##   <int>
-    ## 1     1
+    ## 1     0
 
 Let's check what is the max and min prices (for min we are expecting 0)
 
@@ -558,8 +748,38 @@ apps_dataset %>%
     ##  Median :  0.000  
     ##  Mean   :  1.027  
     ##  3rd Qu.:  0.000  
-    ##  Max.   :400.000  
-    ##  NA's   :1
+    ##  Max.   :400.000
+
+### Type feature
+
+It has no specified the Type, so since the price is 0, we can assume the category is Free
+
+``` r
+apps_dataset %>%  filter(Type == 'NaN')
+```
+
+    ## # A tibble: 1 x 16
+    ##   App   Category Rating Reviews Size  Installs Type  Price Content.Rating
+    ##   <chr> <fct>     <dbl>   <dbl> <fct> <fct>    <fct> <fct> <fct>         
+    ## 1 Comm… FAMILY      NaN       1 Vari… 0        NaN   0     Everyone 10+  
+    ## # … with 7 more variables: Genres <fct>, Last.Updated <fct>,
+    ## #   Current.Ver <fct>, Android.Ver <fct>, SizeNumeric <dbl>,
+    ## #   InstallsNumeric <int>, PriceNumeric <dbl>
+
+There is only one Type = "NaN", so we can fix it,since the Price = 0, we can set it Free.
+
+``` r
+apps_dataset$Type[apps_dataset$Type == "NaN"] <- "Free"
+apps_dataset %>%  filter(Type == 'NaN' | App == "Command & Conquer: Rivals")
+```
+
+    ## # A tibble: 1 x 16
+    ##   App   Category Rating Reviews Size  Installs Type  Price Content.Rating
+    ##   <chr> <fct>     <dbl>   <dbl> <fct> <fct>    <fct> <fct> <fct>         
+    ## 1 Comm… FAMILY      NaN       1 Vari… 0        Free  0     Everyone 10+  
+    ## # … with 7 more variables: Genres <fct>, Last.Updated <fct>,
+    ## #   Current.Ver <fct>, Android.Ver <fct>, SizeNumeric <dbl>,
+    ## #   InstallsNumeric <int>, PriceNumeric <dbl>
 
 ### Last updated feature
 
@@ -574,18 +794,14 @@ match_counter <- apps_dataset %>% filter(str_detect(as.character(Last.Updated), 
 sprintf("Matching %d of %d", sum(match_counter), nrow(apps_dataset))
 ```
 
-    ## [1] "Matching 10840 of 10841"
+    ## [1] "Matching 10841 of 10841"
 
 So all dates seem to be in the same format, so we can convert.
 
 ``` r
 apps_dataset <- apps_dataset %>%
   mutate(Last.UpdatedDate = mdy(Last.Updated))
-```
 
-    ## Warning: 1 failed to parse.
-
-``` r
 head(as.tibble(apps_dataset$Last.UpdatedDate))
 ```
 
@@ -617,4 +833,4 @@ sprintf("Total apps %d", rows_total)
 sprintf("Total apps %d, removing na", rows_without_na)
 ```
 
-    ## [1] "Total apps 9366, removing na"
+    ## [1] "Total apps 9367, removing na"
