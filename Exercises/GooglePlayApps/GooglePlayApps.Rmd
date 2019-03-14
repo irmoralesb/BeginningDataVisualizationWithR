@@ -546,8 +546,8 @@ sprintf("Total apps %d, removing na", rows_without_na)
 
 
 
+## Saving data locally to avoid continue processing it
 
-
-
-
-
+```{r}
+save(apps_dataset, file = "rda/apps_dataset.rda")
+```
