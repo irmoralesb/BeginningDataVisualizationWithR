@@ -301,7 +301,7 @@ apps_dataset %>%
 
     ## Warning: Removed 1474 rows containing non-finite values (stat_bin).
 
-![](GooglePlayApps_files/figure-markdown_github/unnamed-chunk-16-1.png)
+![](GooglePlayApps-Wrangling_files/figure-markdown_github/unnamed-chunk-16-1.png)
 
 Taking a look at the proportion between those that don't have Ratings
 
@@ -318,7 +318,7 @@ apps_dataset %>%
         axis.ticks.x = element_blank())
 ```
 
-![](GooglePlayApps_files/figure-markdown_github/unnamed-chunk-17-1.png)
+![](GooglePlayApps-Wrangling_files/figure-markdown_github/unnamed-chunk-17-1.png)
 
 ### Reviews Feature
 
@@ -411,7 +411,7 @@ apps_dataset %>%
 
     ## Warning: Continuous x aesthetic -- did you forget aes(group=...)?
 
-![](GooglePlayApps_files/figure-markdown_github/unnamed-chunk-23-1.png)
+![](GooglePlayApps-Wrangling_files/figure-markdown_github/unnamed-chunk-23-1.png)
 
 ### Size Feature
 
@@ -538,7 +538,7 @@ apps_dataset %>%
 
     ## Warning: Continuous x aesthetic -- did you forget aes(group=...)?
 
-![](GooglePlayApps_files/figure-markdown_github/unnamed-chunk-29-1.png)
+![](GooglePlayApps-Wrangling_files/figure-markdown_github/unnamed-chunk-29-1.png)
 
 ``` r
   theme(
@@ -613,7 +613,7 @@ apps_dataset %>%
     axis.ticks.x = element_blank())
 ```
 
-![](GooglePlayApps_files/figure-markdown_github/unnamed-chunk-31-1.png)
+![](GooglePlayApps-Wrangling_files/figure-markdown_github/unnamed-chunk-31-1.png)
 
 The outliers are really affecting our current box plot view...let remove those in order for usto be the main data.
 
@@ -630,7 +630,7 @@ apps_dataset %>%
     axis.ticks.x = element_blank())
 ```
 
-![](GooglePlayApps_files/figure-markdown_github/unnamed-chunk-32-1.png)
+![](GooglePlayApps-Wrangling_files/figure-markdown_github/unnamed-chunk-32-1.png)
 
 After taking a comparisson between Installations and InstallationNumeric columns, we can see the numbers are correct, and the distribution is really long. We will analyse later in depth
 
@@ -834,3 +834,10 @@ sprintf("Total apps %d, removing na", rows_without_na)
 ```
 
     ## [1] "Total apps 9367, removing na"
+
+Saving data locally to avoid continue processing it
+---------------------------------------------------
+
+``` r
+save(apps_dataset, file = "rda/apps_dataset.rda")
+```
