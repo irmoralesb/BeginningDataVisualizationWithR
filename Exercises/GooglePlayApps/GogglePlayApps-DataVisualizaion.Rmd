@@ -1,0 +1,69 @@
+---
+title: "Data Visualization"
+output: github_document
+---
+
+# Data Load
+
+Let's start by taking a look to our current dataset
+
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(dslabs)
+
+load("rda/apps_dataset.rda")
+
+head(apps_dataset)
+```
+
+# Data Visualization
+
+So now our data is loaded, let's start by making questions that may fit on the course structure.
+
+## Qualitative Univariate Analysis
+
+**Questions to answer**
+
+
+    * How many apps are in each app category?
+    * How many apps are in each installation range?
+    * What proportion of apps are paid apps?
+    * How many apps are in each app content rating?
+    * How many apps are in each app genre?
+    * What proportion of apps are supporting the latest version?
+    
+
+    
+## Quantitative Univariate Analysis
+
+**Questions to answer**
+    
+    * What is the app rating mean/max/min?
+    * What is the app reviews mean/max/min?
+    * What is the app size mean/max/min?
+    * What is the app average price for an app?
+    * What is the app installation distribution?
+    * Are apps popularity in 2018 still high in comprarisson to previous years?
+    
+
+## Qualitative Bivariate Analysis
+
+**Questions to answer**
+
+
+
+## Quantitative Bivariate Analysis
+
+**Questions to answer**
+
+
+## Qualitative and Quantitative Bivariate Analysis
+
+**Questions to answer**
+    
+    
+    
+    
+    
