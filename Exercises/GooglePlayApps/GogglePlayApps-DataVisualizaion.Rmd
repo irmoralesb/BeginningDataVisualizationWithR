@@ -12,9 +12,10 @@ Let's start by taking a look to our current dataset
 library(tidyverse)
 library(ggplot2)
 library(dslabs)
+library(forcats)
 
 load("rda/apps_dataset.rda")
-
+ds_theme_set()
 head(apps_dataset)
 ```
 
@@ -34,6 +35,35 @@ So now our data is loaded, let's start by making questions that may fit on the c
     * How many apps are in each app genre?
     * What proportion of apps are supporting the latest version?
     
+### How many apps are in each app category?
+
+#### Frequency chart
+
+```{r}
+
+apps_dataset %>% 
+  ggplot(aes(x =fct_infreq(Category))) +
+  geom_bar() +
+  ggtitle("Count of Apps by Category") +
+  xlab("Category") +
+  ylab("Count") +
+  theme(axis.text.x = element_text(angle = 90))
+
+```
+
+
+```{r}
+
+apps_dataset %>% 
+  ggplot(aes(x =fct_rev(fct_infreq(Category)))) +
+  coord_flip() +
+  geom_bar() +
+  ggtitle("Count of Apps by Category") + 
+  xlab("Count") +
+  ylab("Category") +
+  theme(axis.text.x = element_text(angle = 90))
+```
+
 
     
 ## Quantitative Univariate Analysis
