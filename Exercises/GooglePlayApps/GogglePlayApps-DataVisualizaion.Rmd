@@ -51,6 +51,8 @@ apps_dataset %>%
 
 ```
 
+#### Frequency chart
+We have too many categories, so it's a better approach to display the data horizontally
 
 ```{r}
 
@@ -64,6 +66,42 @@ apps_dataset %>%
   theme(axis.text.x = element_text(angle = 90))
 ```
 
+#### Cleveland plot
+
+It is an alternative way to show the data, but horizontal bar chart is clearer
+
+```{r}
+apps_dataset %>%
+  ggplot(aes(x =fct_rev(fct_infreq(Category)))) +
+  geom_point(stat = "count") +
+  coord_flip() +
+  ggtitle("Count of Apps by Category") +
+  xlab("Count") + 
+  ylab("Category") +
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+
+#### Pie chart
+
+*Disclamer: Pie chart is not a recomended way to display any data, and it must not be used in general, anyway, invery few scenarios may be useful.*
+
+As we can see, this data visualization is not clear nor useful for this amount of categories, anyway, we can answer easily the question about what category has more apps. 
+
+```{r}
+apps_dataset %>% 
+  ggplot(aes(x = "", fill = Category)) +
+  geom_bar() +
+  coord_polar(theta = "y") +
+  ggtitle("Count of Apps by Category") +
+  ylab("") +
+  xlab("") +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.y = element_blank()
+  )
+  
+```
 
     
 ## Quantitative Univariate Analysis
