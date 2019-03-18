@@ -563,6 +563,30 @@ head(as.tibble(apps_dataset$Last.UpdatedDate))
 
 
 
+##Content Rating feature
+
+```{r}
+
+apps_dataset %>%
+  select (Content.Rating, App) %>%
+  group_by(Content.Rating) %>%
+  summary(count = count(App))
+
+```
+
+```{r}
+
+apps_dataset$Content.Rating <-factor(apps_dataset$Content.Rating,levels=  c("Everyone","Everyone 10+","Teen","Mature 17+","Adults only 18+","Unrated"))
+
+apps_dataset %>%
+  select (Content.Rating, App) %>%
+  group_by(Content.Rating) %>%
+  summary(count = count(App))
+
+```
+
+
+
 ## Record Counting
 
 How many apps are there?

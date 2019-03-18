@@ -272,6 +272,54 @@ Answers :
     * What proportion of apps are paid apps?
     - Free apps are predominant app types, less than 10% of apps are paid apps.
 
+
+### How many apps are in each app content rating?
+
+#### Frequency bar
+
+```{r}
+
+apps_dataset %>%
+  ggplot(aes(Content.Rating)) +
+  geom_bar() +
+  ggtitle("Count of Apps by Content Rating") +
+  xlab("Content Ratings") + 
+  ylab("Count")
+```
+
+
+#### Horizontal frequency bar
+
+```{r}
+apps_dataset %>%
+  ggplot(aes(Content.Rating)) +
+  geom_bar() +
+  ggtitle ("Count of Apps by App Content Ratings") +
+  xlab("Content Rating") +
+  ylab("Count") +
+  coord_flip()
+```
+
+
+
+#### Cleveland plot
+
+
+#### Pie chart
+
+
+#### Answer
+
+Question
+*How many apps are in each app rating?*
+
+
+Answer
+
+
+
+
+
 ## Quantitative Univariate Analysis
 
 **Questions to answer**
