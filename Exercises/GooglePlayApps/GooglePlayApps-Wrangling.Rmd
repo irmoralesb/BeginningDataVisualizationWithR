@@ -25,6 +25,13 @@ apps_dataset_original = read.csv("../../data/googleplaystore.csv", header = TRUE
 
 #class(apps_dataset)
 head(as.tibble(apps_dataset_original))
+
+
+# apps_dataset_original %>% 
+#   group_by(Installs) %>%
+#   select(Installs, App) %>%
+#   summarize(count = n())
+
 ```
 
 
@@ -365,9 +372,24 @@ apps_dataset %>%
 
 We may need to keep it as factor, but we also will need it as numeric, so we are creating a second column with those values
 
+We need to fix an incorrect value for Installs, it's "0" when it should be "0+", also two factors are not needed : "0" and "Free".
+```{r}
+apps_dataset %>% 
+  group_by(Installs) %>%
+  select(Installs, App) %>%
+  summarize(count = n())
+
+# Fixing invalid entry 0
+apps_dataset$Installs[apps_dataset$Installs == "0"] <- "0+"
+
+```
+
+
+
 we need to remove: **",","+" **
     
 ```{r}
+
 options(scipen = 999) # Disabling scientific notation
 apps_dataset <- apps_dataset %>% 
   mutate(InstallsNumeric = str_replace_all(Installs, "[,*+$]", "")) %>%
@@ -416,6 +438,15 @@ apps_dataset %>%
 ```
 
 After taking a comparisson between Installations and InstallationNumeric columns, we can see the numbers are correct, and the distribution is really long. We will analyse later in depth
+
+We also need to sort the levels to something that makes more sense to us.
+
+```{r}
+levels_sorted <- c("0+","1+","5+","10+","50+","100+","500+","1,000+","5,000+","10,000+","50,000+","100,000+","500,000+","1,000,000+","5,000,000+","10,000,000+","50,000,000+","100,000,000+","500,000,000+","1,000,000,000+","0","Free")
+
+apps_dataset$Installs <- factor(apps_dataset$Installs,levels = levels_sorted)
+```
+
 
 ### Price feature
 
