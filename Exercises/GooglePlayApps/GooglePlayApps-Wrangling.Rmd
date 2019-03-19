@@ -50,7 +50,8 @@ head(as.tibble(apps_dataset_original))
 ```
 
 
-### Incorrect record
+
+#### Incorrect record
 
 In a later analysis has been detected a broken record, but since this affects to the rest of conversions has been moved into this first steps.
 
@@ -100,6 +101,110 @@ apps_dataset_original %>%
 #levels(apps_dataset_original$Genres)
 
 ```
+
+
+
+#### Duplicated Entries
+
+It has been detected that the App name is duplicated for several apps, 
+```{r}
+duplicated_apps <- apps_dataset_original %>% 
+  arrange(App) %>%
+  group_by(App) %>% 
+  filter(n() > 1) %>%
+  ungroup()
+
+duplicated_apps %>% select(App, Category, Rating, Current.Ver) %>% head()
+
+```
+
+**There are some cases where the app is more than once because it has a different version**
+
+```{r}
+duplicated_apps %>%
+  distinct(App, Current.Ver) %>%
+  group_by(App) %>%
+  mutate(Current.Ver.Diff = n()) %>%
+  ungroup() %>%
+  filter(Current.Ver.Diff > 1) 
+```
+
+Since we are interested in the latest version only, we are going to get such record.
+
+
+```{r}
+
+apps_dataset_original %>%
+  filter(str_detect(Current.Ver,","))
+
+version.numbers <- c("3.27.3","2.3.3122","Varies with device","7","0.5")
+
+get_max_app_version <- function(version.number){
+  str_split(version.number,".")
+  
+}
+
+
+```
+
+
+
+
+In some cases we can see that the Category feature varies, for instance 8 Ball Pool
+
+```{r}
+duplicated_apps %>%
+  select(App, Category) %>%
+  group_by(App, Category) %>%
+  summarize(n=n())
+
+```
+
+In other cases the Genre varies, these are the records that contain more than one Genre in different lines
+
+```{r}
+
+duplicated_apps %>%
+  mutate(Genres = as.character(Genres)) %>%
+  select(App, Genres) %>%
+  distinct(App,Genres) %>%
+  group_by(App) %>%
+  summarize(n = n()) %>%
+  filter(n > 1)
+
+```
+
+Let's see what they are...
+
+```{r}
+duplicated_apps %>%
+  mutate(Genres = as.character(Genres)) %>%
+  distinct(App,Genres) %>%
+  group_by(App) %>%
+  mutate(Genre.Duplicated = n()) %>%
+  ungroup() %>%
+  select(App, Genres, Genre.Duplicated) %>%
+  filter(Genre.Duplicated > 1) 
+```
+
+There are also different number in ratings
+
+```{r}
+
+duplicated_apps %>%
+  distinct(App, Rating) %>%
+  group_by(App) %>%
+  mutate(Rating.Diff= n()) %>%
+  ungroup() %>%
+  filter(Rating.Diff > 1)
+  
+  
+class(duplicated_apps$Rating)
+
+```
+
+
+
 
 
 
