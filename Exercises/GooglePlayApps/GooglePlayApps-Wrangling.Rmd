@@ -587,6 +587,45 @@ apps_dataset %>%
 
 
 
+## Genres feature
+
+One app can have more than one genre, and the genres are recorded in the same value split by comas, so we need to extract all of them and create the relationship.
+
+**Note: It has been validated that the max number of Genres per apps is 2**
+
+```{r}
+genres_dataset <- apps_dataset %>%
+  mutate (Genres = as.character(Genres)) %>%
+  select(App, Genres)
+  
+
+genres_dataset <- genres_dataset %>%  
+  mutate(Test = str_split(genres_dataset$Genres, ";", simplify = TRUE))
+
+apps_dataset_original %>%
+  filter(App %in% c('Coloring book moana'))
+
+apps_dataset %>% 
+  select(App, Category) %>%
+  group_by(App) %>% 
+  count() %>%
+  filter(n > 1) 
+
+apps_dataset_original %>% 
+  filter(App == "8 Ball Pool")
+
+
+genres_dataset %>%  
+  separate( Genres, c("Genre1","Genre2"),";") %>%
+  gather("Genre", Genres,  `Genre1`:`Genre2`) %>% 
+  filter(App %in% c('Coloring book moana')) %>%
+  head()
+#'Photo Editor & Candy Camera & Grid & ScrapBook',
+```
+
+
+
+
 ## Record Counting
 
 How many apps are there?
