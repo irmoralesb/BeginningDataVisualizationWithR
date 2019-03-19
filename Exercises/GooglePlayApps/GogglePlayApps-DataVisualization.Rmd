@@ -297,15 +297,42 @@ apps_dataset %>%
   ggtitle ("Count of Apps by App Content Ratings") +
   xlab("Content Rating") +
   ylab("Count") +
-  coord_flip()
+  coord_flip() + 
+  geom_text(aes(label = ..count.., hjust = -.1), stat = "count") +
+  scale_y_continuous(limits = c(0,9000))
 ```
 
 
 
 #### Cleveland plot
 
+```{r}
+apps_dataset %>%
+  ggplot(aes(x=Content.Rating)) +
+  geom_point(stat = "count") +
+  xlab("Content Rating") +
+  ylab("Count") +
+  coord_flip() +
+  ggtitle("Count of Apps by App Content Rating") + 
+  geom_text(aes(label = ..count.., vjust = -1), stat = "count")
+```
+
 
 #### Pie chart
+
+```{r}
+apps_dataset %>%
+  ggplot(aes(x= "", fill = Content.Rating)) +
+  geom_bar() +
+  coord_polar(theta = "y") +
+  ggtitle("Count of Apps by App Content Rating") +
+  xlab("") +
+  ylab("") +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank()
+  )
+```
 
 
 #### Answer
@@ -314,8 +341,73 @@ Question
 *How many apps are in each app rating?*
 
 
+Now we can tell easly how many apps are in each content rating, and also what are the most/less popular.
+Answer
+    
+    * How many apps are in each app rating?
+      We can easly see the data from the chart.
+    * What is the content rating with more apps?
+      - Everyone
+    * what is the content rating with less apps?
+      - Unrated and Adults Only 18+
+
+
+### How many apps are in each app genre?
+
+
+As you can see from the first frequency bar, the chart is not what we expected and also this is mainly to the fact that one app can be related to more than one Genre.
+
+#### Frequency chart
+
+```{r}
+apps_dataset %>% 
+  ggplot(aes(Genres)) +
+  geom_bar() +
+  xlab("Genres") +
+  ylab("Count") +
+  ggtitle("Count of Apps by App Genre") +
+  theme(
+    axis.text  = element_text(angle = 90))
+
+```
+
+So we have now a different table with the genres, we can join the data frames and get what we need.
+
+
+#### Horizontal frequency chart
+
+#### Cleveland plot
+
+#### Pie chart
+
+#### Answer
+
+Question
+*How many apps are in each app genre?*
+
 Answer
 
+    * 
+
+
+### What proportion of apps are supporting the latest version?
+
+#### Frequency chart
+
+#### Horizontal frequency chart
+
+#### Cleveland plot
+
+#### Pie chart
+
+#### Answer
+
+Question
+*How many apps are in each app genre?*
+
+Answer
+
+    * 
 
 
 
