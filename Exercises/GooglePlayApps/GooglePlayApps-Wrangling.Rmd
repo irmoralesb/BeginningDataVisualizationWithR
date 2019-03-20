@@ -44,11 +44,17 @@ Let's confirm the column types are correct and also the values.
 From previous point, we can see the App column, which contains app names, is factor data type, we need to change it to character.
 
 ```{r}
-apps_dataset_original = read.csv("../../data/googleplaystore.csv", header = TRUE, sep = ",", as.is = c("App"))
+apps_dataset_original = read.csv("../../data/googleplaystore.csv", header = TRUE, sep = ",", as.is = c("App","Current.Ver"))
 
 head(as.tibble(apps_dataset_original))
 ```
 
+Removing extra spaces to App feature
+```{r}
+apps_dataset_original %>% 
+  mutate(App = str_trim(App))
+
+```
 
 
 #### Incorrect record
@@ -101,6 +107,107 @@ apps_dataset_original %>%
 #levels(apps_dataset_original$Genres)
 
 ```
+
+
+### Split Data into Different Dataframes
+
+After some previous data exploratory analysis, I've determinined to split the data into different data frames, so it is reflecting tidy data  
+
+Data frames:
+
+    1) Apps, it will contain:
+      - App
+    2) Apps_Versions, it will contain:
+      - App
+      - Rating
+      - Reviews
+      - Size
+      - Installs
+      - Type
+      - Price	
+      - Content.Rating	
+      - Last.Updated	
+      - Current.Ver
+      - Andoid.Ver
+    3) App_Genres, it will contain:
+      - App
+      - Genres
+    4) App_Categories, it will contain:
+      - App
+      - Category
+
+
+Then we will be able to create additional data
+
+```{r}
+apps_dataset <- apps_dataset_original %>% 
+  select(App) %>% distinct()
+
+apps_versions_dataset <- apps_dataset_original %>%
+  select(App,Current.Ver,Rating,Reviews, Size, Installs, Type, Price, Content.Rating,Last.Updated, Android.Ver)
+
+apps_genres <- apps_dataset_original %>% 
+  select(App, Genres)
+
+apps_categories <- apps_dataset_original %>% 
+  select(App,Category)
+
+```
+
+Now that we have our data split, we can start cleaning up
+
+
+### Current Version Feature
+
+There are some versions with "," instead of ".", so we are fixing it, we are creating a new version column
+
+```{r}
+
+varies <- "Varies with device"
+apps_versions_dataset <- apps_versions_dataset %>% 
+  mutate(Current.Ver.Original = Current.Ver) %>%
+  mutate(Current.Ver = case_when(
+           str_detect(Current.Ver,",") ~ str_replace_all(Current.Ver.Original,",","."),
+           Current.Ver != varies &  str_detect(Current.Ver.Original,"-[a-zA-Z\\s]$") ~ str_remove_all(Current.Ver.Original,"-[a-zA-Z\\s]$"),
+           Current.Ver != varies &  str_detect(Current.Ver.Original,"[a-zA-Z]") ~ str_remove_all(Current.Ver.Original,"[a-zA-Z]"),
+           Current.Ver != varies & str_detect(Current.Ver.Original, "[(*)]") ~ str_remove_all(Current.Ver.Original,"[(*)]"),
+           Current.Ver != varies & str_detect(Current.Ver.Original, "-[0-9]*") ~ str_remove_all(Current.Ver.Original,"-[0-9]*$"),
+           TRUE ~ Current.Ver.Original
+         ))
+
+apps_versions_dataset %>% select(App, Current.Ver, Current.Ver.Original) %>%
+  filter(Current.Ver != "Varies with device" & str_detect(Current.Ver, "-[0-9]*$"))
+
+apps_dataset_original %>% filter(App == "CCP DZ : Fill out a check | Number in letters DZD")
+
+
+```
+
+
+
+Let's see if there are versions without numbers, only text
+
+```{r}
+apps_dataset_original %>%
+  filter(Current.Ver != "Varies with device" &  !str_detect(Current.Ver,"([0-9])")) %>%
+  select(App, Current.Ver) %>%
+  head(n = 25)
+```
+
+Checking if from those apps there are a differnt version
+
+```{r}
+incorrect_version <- apps_dataset_original %>%
+  filter(Current.Ver != "Varies with device" &  !str_detect(Current.Ver,"([0-9])")) %>%
+  select(App, Current.Ver) 
+
+apps_dataset_original %>% filter(App %in% incorrect_version$App) %>% group_by(App) %>% summarize(n = n()) %>% filter(n > 1)
+
+
+```
+
+So there are no apps duplicated with those versions, so we can set the version 1.0.0.0
+
 
 
 
