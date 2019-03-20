@@ -162,21 +162,38 @@ Now that we have our data split, we can start cleaning up
 There are some versions with "," instead of ".", so we are fixing it, we are creating a new version column
 
 ```{r}
+## CONTINUE HERE....
 
 varies <- "Varies with device"
-apps_versions_dataset <- apps_versions_dataset %>% 
-  mutate(Current.Ver.Original = Current.Ver) %>%
-  mutate(Current.Ver = case_when(
-           str_detect(Current.Ver,",") ~ str_replace_all(Current.Ver.Original,",","."),
-           Current.Ver != varies &  str_detect(Current.Ver.Original,"-[a-zA-Z\\s]$") ~ str_remove_all(Current.Ver.Original,"-[a-zA-Z\\s]$"),
-           Current.Ver != varies &  str_detect(Current.Ver.Original,"[a-zA-Z]") ~ str_remove_all(Current.Ver.Original,"[a-zA-Z]"),
-           Current.Ver != varies & str_detect(Current.Ver.Original, "[(*)]") ~ str_remove_all(Current.Ver.Original,"[(*)]"),
-           Current.Ver != varies & str_detect(Current.Ver.Original, "-[0-9]*") ~ str_remove_all(Current.Ver.Original,"-[0-9]*$"),
-           TRUE ~ Current.Ver.Original
-         ))
+#pattern <- "(0-9*a-z*A-Z*)|-[a-zA-Z\\s]$|[a-zA-Z]|-[0-9\\s]*"
+pattern <- "^[0-9]{0,4}$|^[0-9]{0,4}\\.[0-9]{0,4}\\.?[0-9]{0,4}\\.?[0-9]{0,4}$"
+
+apps_versions_dataset %>% filter(!str_detect(Current.Ver,pattern) & Current.Ver != varies) %>% count()
+
+
+
+# apps_versions_dataset <- apps_versions_dataset %>% 
+#   mutate(Current.Ver.Original = Current.Ver) %>%
+#   mutate(Current.Ver = case_when(
+#            str_detect(Current.Ver.Original,",") ~ str_replace_all(Current.Ver.Original,",","."),
+#            Current.Ver != varies & str_detect(Current.Ver.Original,pattern = pattern) ~ str_replace_all(Current.Ver.Original,pattern = pattern, ""),
+           
+           #Current.Ver != varies &  str_detect(Current.Ver.Original,"-[a-zA-Z\\s]$") ~ str_remove_all(Current.Ver.Original,"-[a-zA-Z\\s]$"),
+           #Current.Ver != varies &  str_detect(Current.Ver.Original,"[a-zA-Z]") ~ str_replace_all(Current.Ver.Original,"[a-zA-Z]",""),
+           #Current.Ver != varies & str_detect(Current.Ver.Original, "[(*)]") ~ str_replace_all(Current.Ver.Original,"[(*)]",""),
+           #Current.Ver != varies & str_detect(Current.Ver.Original, "-[0-9\\s]*") ~ str_replace_all(Current.Ver.Original,"-[0-9\\s]*",""),
+         #   TRUE ~ Current.Ver.Original
+         # ))
 
 apps_versions_dataset %>% select(App, Current.Ver, Current.Ver.Original) %>%
-  filter(Current.Ver != "Varies with device" & str_detect(Current.Ver, "-[0-9]*$"))
+#  filter(Current.Ver != "Varies with device" & str_detect(Current.Ver, "-[0-9]*"))
+  filter(Current.Ver.Original != "Varies with device" & str_detect(Current.Ver.Original, "-[0-9\\s]*"))
+
+
+apps_versions_dataset %>% select(App, Current.Ver) %>%
+#  filter(Current.Ver != "Varies with device" & str_detect(Current.Ver, "-[0-9]*"))
+  filter(Current.Ver != "Varies with device" & str_detect(Current.Ver, "-[0-9\\s]*"))
+
 
 apps_dataset_original %>% filter(App == "CCP DZ : Fill out a check | Number in letters DZD")
 
