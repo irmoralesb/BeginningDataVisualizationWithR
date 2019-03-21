@@ -50,10 +50,9 @@ head(as.tibble(apps_dataset_original))
 ```
 
 Removing extra spaces to App feature
-```{r}
+```{r message=FALSE, comment=FALSE, echo=FALSE}
 apps_dataset_original %>% 
   mutate(App = str_trim(App))
-
 ```
 
 
@@ -146,10 +145,10 @@ apps_dataset <- apps_dataset_original %>%
 apps_versions_dataset <- apps_dataset_original %>%
   select(App,Current.Ver,Rating,Reviews, Size, Installs, Type, Price, Content.Rating,Last.Updated, Android.Ver)
 
-apps_genres <- apps_dataset_original %>% 
+apps_genres_dataset <- apps_dataset_original %>% 
   select(App, Genres)
 
-apps_categories <- apps_dataset_original %>% 
+apps_categories_dataset <- apps_dataset_original %>% 
   select(App,Category)
 
 ```
@@ -159,192 +158,38 @@ Now that we have our data split, we can start cleaning up
 
 ### Current Version Feature
 
-There are some versions with "," instead of ".", so we are fixing it, we are creating a new version column
+It has been found that there are a lot of different app version formats, but we are not going to group by any means, mainly because it is not a general way to evaluate or analizing, each company set its own rules for this value.
+
+Anyway, executing this code you can see all app version format that does not math the more general format: x.xxxx.xxxx.xxxx
 
 ```{r}
-## CONTINUE HERE....
 
 varies <- "Varies with device"
-#pattern <- "(0-9*a-z*A-Z*)|-[a-zA-Z\\s]$|[a-zA-Z]|-[0-9\\s]*"
 pattern <- "^[0-9]{0,4}$|^[0-9]{0,4}\\.[0-9]{0,4}\\.?[0-9]{0,4}\\.?[0-9]{0,4}$"
 
-apps_versions_dataset %>% filter(!str_detect(Current.Ver,pattern) & Current.Ver != varies) %>% count()
-
-
-
-# apps_versions_dataset <- apps_versions_dataset %>% 
-#   mutate(Current.Ver.Original = Current.Ver) %>%
-#   mutate(Current.Ver = case_when(
-#            str_detect(Current.Ver.Original,",") ~ str_replace_all(Current.Ver.Original,",","."),
-#            Current.Ver != varies & str_detect(Current.Ver.Original,pattern = pattern) ~ str_replace_all(Current.Ver.Original,pattern = pattern, ""),
-           
-           #Current.Ver != varies &  str_detect(Current.Ver.Original,"-[a-zA-Z\\s]$") ~ str_remove_all(Current.Ver.Original,"-[a-zA-Z\\s]$"),
-           #Current.Ver != varies &  str_detect(Current.Ver.Original,"[a-zA-Z]") ~ str_replace_all(Current.Ver.Original,"[a-zA-Z]",""),
-           #Current.Ver != varies & str_detect(Current.Ver.Original, "[(*)]") ~ str_replace_all(Current.Ver.Original,"[(*)]",""),
-           #Current.Ver != varies & str_detect(Current.Ver.Original, "-[0-9\\s]*") ~ str_replace_all(Current.Ver.Original,"-[0-9\\s]*",""),
-         #   TRUE ~ Current.Ver.Original
-         # ))
-
-apps_versions_dataset %>% select(App, Current.Ver, Current.Ver.Original) %>%
-#  filter(Current.Ver != "Varies with device" & str_detect(Current.Ver, "-[0-9]*"))
-  filter(Current.Ver.Original != "Varies with device" & str_detect(Current.Ver.Original, "-[0-9\\s]*"))
-
-
-apps_versions_dataset %>% select(App, Current.Ver) %>%
-#  filter(Current.Ver != "Varies with device" & str_detect(Current.Ver, "-[0-9]*"))
-  filter(Current.Ver != "Varies with device" & str_detect(Current.Ver, "-[0-9\\s]*"))
-
-
-apps_dataset_original %>% filter(App == "CCP DZ : Fill out a check | Number in letters DZD")
-
-
-```
-
-
-
-Let's see if there are versions without numbers, only text
-
-```{r}
-apps_dataset_original %>%
-  filter(Current.Ver != "Varies with device" &  !str_detect(Current.Ver,"([0-9])")) %>%
+# Viewing the records
+apps_versions_dataset %>% 
+  filter(!str_detect(Current.Ver,pattern) & Current.Ver != varies) %>%
   select(App, Current.Ver) %>%
-  head(n = 25)
-```
-
-Checking if from those apps there are a differnt version
-
-```{r}
-incorrect_version <- apps_dataset_original %>%
-  filter(Current.Ver != "Varies with device" &  !str_detect(Current.Ver,"([0-9])")) %>%
-  select(App, Current.Ver) 
-
-apps_dataset_original %>% filter(App %in% incorrect_version$App) %>% group_by(App) %>% summarize(n = n()) %>% filter(n > 1)
-
-
-```
-
-So there are no apps duplicated with those versions, so we can set the version 1.0.0.0
-
-
-
-
-#### Duplicated Entries
-
-It has been detected that the App name is duplicated for several apps, 
-```{r}
-duplicated_apps <- apps_dataset_original %>% 
-  arrange(App) %>%
-  group_by(App) %>% 
-  filter(n() > 1) %>%
-  ungroup()
-
-duplicated_apps %>% select(App, Category, Rating, Current.Ver) %>% head()
-
-```
-
-**There are some cases where the app is more than once because it has a different version**
-
-```{r}
-duplicated_apps %>%
-  distinct(App, Current.Ver) %>%
-  group_by(App) %>%
-  mutate(Current.Ver.Diff = n()) %>%
-  ungroup() %>%
-  filter(Current.Ver.Diff > 1) 
-```
-
-Since we are interested in the latest version only, we are going to get such record.
-
-
-```{r}
-
-apps_dataset_original %>%
-  filter(str_detect(Current.Ver,","))
-
-version.numbers <- c("3.27.3","2.3.3122","Varies with device","7","0.5")
-
-get_max_app_version <- function(version.number){
-  str_split(version.number,".")
-  
-}
-
+  head()
 
 ```
 
 
 
-
-In some cases we can see that the Category feature varies, for instance 8 Ball Pool
-
-```{r}
-duplicated_apps %>%
-  select(App, Category) %>%
-  group_by(App, Category) %>%
-  summarize(n=n())
-
-```
-
-In other cases the Genre varies, these are the records that contain more than one Genre in different lines
-
-```{r}
-
-duplicated_apps %>%
-  mutate(Genres = as.character(Genres)) %>%
-  select(App, Genres) %>%
-  distinct(App,Genres) %>%
-  group_by(App) %>%
-  summarize(n = n()) %>%
-  filter(n > 1)
-
-```
-
-Let's see what they are...
-
-```{r}
-duplicated_apps %>%
-  mutate(Genres = as.character(Genres)) %>%
-  distinct(App,Genres) %>%
-  group_by(App) %>%
-  mutate(Genre.Duplicated = n()) %>%
-  ungroup() %>%
-  select(App, Genres, Genre.Duplicated) %>%
-  filter(Genre.Duplicated > 1) 
-```
-
-There are also different number in ratings
-
-```{r}
-
-duplicated_apps %>%
-  distinct(App, Rating) %>%
-  group_by(App) %>%
-  mutate(Rating.Diff= n()) %>%
-  ungroup() %>%
-  filter(Rating.Diff > 1)
-  
-  
-class(duplicated_apps$Rating)
-
-```
-
-
-
-
-
-
-### Rating feature
+### Rating Feature
 
 Let's take a look at those features that contains NAs
 
 ```{r}
-colnames(apps_dataset_original)[colSums(is.na(apps_dataset_original)) > 0]
+colnames(apps_versions_dataset)[colSums(is.na(apps_versions_dataset)) > 0]
 ```
 
 Let's confirm how many observations there are with NA
 
 We see Rating column is numeric
 ```{r}
-class(apps_dataset_original$Rating)
+class(apps_versions_dataset$Rating)
 ```
 
 Therefore those recods are missing, it may be due to:
@@ -356,7 +201,7 @@ Therefore those recods are missing, it may be due to:
     
 
 ```{r}
-apps_without_ratings <-  apps_dataset_original %>% 
+apps_without_ratings <-  apps_versions_dataset %>% 
   filter(is.na(Rating)) %>%
   nrow()
 
@@ -370,7 +215,7 @@ Let's explore the Ratings... we are going to convert them in categorical data to
 
 
 ```{r}
-apps_dataset_original %>% 
+apps_versions_dataset %>% 
   mutate(RatingTemp = round(Rating)) %>%
   filter(!is.na(RatingTemp)) %>%
   select(Rating, RatingTemp) %>%
@@ -378,50 +223,20 @@ apps_dataset_original %>%
   summarize()
 ```
 
-We found that there are **Ratings of 19!!!** this is not expected
+Previously I found a record that had some values shift to the right, the record had  **Ratings of 19!!!** this is not expected, this is the record updated in the beginning of this file
 
 Let take a closer look
 
+Now I can see there is no rating out of range
 ```{r}
-apps_dataset_original %>%
-  mutate(RatingTemp = round(Rating)) %>%
-  group_by(RatingTemp) %>%
-  summarize(count = n())
-```
-
-Validating if there are more Ratings out of range
-```{r}
-apps_dataset_original %>% 
+apps_versions_dataset %>% 
   filter(Rating > 5.0 | Rating < 0) %>%
   count()
 ```
 
 
-**There is only one app with Rating 19, it may be 1.9, I am taking the decision of changing the value to 1.9**
-
 ```{r}
-apps_dataset <- apps_dataset_original
-head(as.tibble(apps_dataset$Rating))
-
-rating_indexes <- !is.na(apps_dataset[,3]) & apps_dataset[,3] > 5.0
-
-apps_dataset[rating_indexes,3] <- apps_dataset[rating_indexes,3] * 0.1
-
-
-```
-
-Validating the change has been applied
-
-```{r}
-apps_dataset %>%
-  mutate(RatingTemp = round(Rating)) %>%
-  group_by(RatingTemp) %>%
-  summarize(count = n())
-```
-
-
-```{r}
-apps_dataset %>%
+apps_versions_dataset %>%
   ggplot(aes(x= Rating))+
   coord_cartesian(xlim = c(0,6)) +
   geom_histogram(bins=5) + 
@@ -432,7 +247,7 @@ apps_dataset %>%
 Taking a look at the proportion between those that don't have Ratings
 
 ```{r}
-apps_dataset %>% 
+apps_versions_dataset %>% 
   mutate(HasRating = !is.na(Rating)) %>%
   ggplot(aes(x ="", fill = HasRating)) +
   geom_bar() +
@@ -449,45 +264,44 @@ apps_dataset %>%
 
 We see this feature is set as factor when it must be numeric
 ```{r}
-apps_dataset %>%
+apps_versions_dataset %>%
   filter(is.na(as.numeric(Reviews))) %>%
   select(App)
 ```
 So, Reviews contains only numeric entries, so we convert those explicit
 
 ```{r}
-apps_dataset <-  apps_dataset %>% 
+apps_versions_dataset <- apps_versions_dataset %>% 
   mutate(Reviews = as.numeric(Reviews))
 
-head(as.tibble(apps_dataset))
+head(as.tibble(apps_versions_dataset))
 ```
 
 The Reviews feature is now numeric, let's check if there are NAs
 
 ```{r}
-na_counter <-sum(is.na(apps_dataset[,4]))
+na_counter <-sum(is.na(apps_versions_dataset[,4]))
 sprintf("There are %d Reviews with NA", na_counter)
 ```
 So we are done with this feature.
 
 ```{r}
-apps_dataset %>%
-  group_by(Category) %>%
+apps_versions_dataset %>%
+  group_by(Content.Rating) %>%
   summarize(count = n(), max = max(Reviews), min = min(Reviews))
-
 ```
 
 ```{r}
-max_value <- max(apps_dataset$Reviews)
-min_value <- min(apps_dataset$Reviews)
-sprintf("Max value %d, Min value %d", max_value, min_value)
+max_value <- max(apps_versions_dataset$Reviews)
+min_value <- min(apps_versions_dataset$Reviews)
+sprintf("Max Reviews %d, Min Reviews %d", max_value, min_value)
   
 ```
 
 Let's take a quick view to the current data, sowe may see any unexpected value
 
 ```{r}
-apps_dataset %>%
+apps_versions_dataset %>%
   ggplot(aes(x = Reviews, y = Reviews)) +
   geom_boxplot() +
   ggtitle("Review Distribution") +
@@ -501,13 +315,275 @@ apps_dataset %>%
 
 
 
+### Install Feature
+
+We may need to keep it as factor, but we also will need it as numeric, so we are creating a second column with those values
+
+We need to fix an incorrect value for Installs, it's "0" when it should be "0+", also two factors are not needed : "0" and "Free".
+```{r}
+apps_versions_dataset %>% 
+  group_by(Installs) %>%
+  select(Installs, App) %>%
+  summarize(count = n())
+
+# Fixing invalid entry 0
+apps_versions_dataset$Installs[apps_versions_dataset$Installs == "0"] <- "0+"
+
+```
+
+I need to remove: **",","+" **
+    
+```{r}
+
+options(scipen = 999) # Disabling scientific notation
+apps_versions_dataset <- apps_versions_dataset %>% 
+  mutate(InstallsNumeric = str_replace_all(Installs, "[,*+$]", "")) %>%
+  mutate(InstallsNumeric = as.integer(InstallsNumeric))
+
+na_counter <- apps_versions_dataset %>% 
+    filter(is.na(InstallsNumeric)) %>%
+    count()
+
+sprintf("There are %d NAs", sum(na_counter))
+summary(apps_versions_dataset$InstallsNumeric)
+
+```
+
+There are no NA, it used to be due to the incorrect observation fixed at the beginning... But the current distribution is really odd
+
+```{r}
+
+apps_versions_dataset %>% select(Installs,InstallsNumeric) %>% head()
+
+apps_versions_dataset %>%
+  ggplot(aes(x=50, y = InstallsNumeric)) +
+  geom_boxplot() +
+  ggtitle("Install distribution") +
+  xlab("") +
+  ylab("Installations") +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank())
+```
+
+
+The outliers are really affecting our current box plot view...let's remove those in order for usto be the main data.
+
+```{r}
+apps_versions_dataset %>%
+  filter(InstallsNumeric <=1000000) %>%
+  ggplot(aes(x=50, y = InstallsNumeric)) +
+  geom_boxplot() +
+  ggtitle("Install distribution") +
+  xlab("") +
+  ylab("Installations") +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank())
+```
+
+After taking a comparisson between Installations and InstallationNumeric columns, we can see the numbers are correct, and the distribution is really long. We will analyse later in depth
+
+We also need to sort the levels to something that makes more sense to us.
+
+```{r}
+levels_sorted <- c("0+","1+","5+","10+","50+","100+","500+","1,000+","5,000+","10,000+","50,000+","100,000+","500,000+","1,000,000+","5,000,000+","10,000,000+","50,000,000+","100,000,000+","500,000,000+","1,000,000,000+","0","Free")
+
+apps_versions_dataset$Installs <- factor(apps_versions_dataset$Installs,levels = levels_sorted)
+```
+
+
+### Price Feature
+
+The price feature is set as factor, we need to convert it to numeric
+
+```{r}
+apps_versions_dataset %>%
+  filter(is.na(as.numeric(Price))) %>%
+  group_by(Type) %>%
+  select(Type) %>%
+  summary()
+
+```
+There are no NAs  
+
+Let's validate there are no format characters
+
+```{r}
+apps_versions_dataset %>%
+  filter(str_detect(Price,pattern = "[a-zA-Z,$]")) %>%
+  select(Price) %>%
+  head()
+
+```
+
+There are format characters, so we need to clean up
+
+```{r}
+apps_versions_dataset <- apps_versions_dataset %>% 
+  mutate(PriceNumeric = as.numeric(str_replace_all(Price,pattern = "[a-zA-Z,$]","")))
+
+```
+
+**Is there any Free application with Price different from 0?**
+
+```{r}
+apps_versions_dataset %>%  filter(Type == 'Free' & Price != '0') %>% count()
+```
+**there is none**
+
+
+**Is there any not free application but the price is 0?**
+
+```{r}
+apps_versions_dataset %>%  filter(Type != 'Free' & Price == '0') %>% count()
+```
+**There is detected one incorrect Type observation, it was missing Free for price = 0**, so this is why the line below is there.
+
+
+```{r}
+apps_versions_dataset %>%  filter(Type != 'Free' & Price == '0')
+```
+
+We didn't get any NA message when converting the Price column, but we are going to double check
+
+```{r}
+apps_versions_dataset %>%
+  filter(is.na(PriceNumeric)) %>%
+  count()
+
+```
+
+Let's check what is the max and min prices (for min we are expecting 0)
+
+```{r}
+apps_versions_dataset %>%  
+  select(PriceNumeric) %>%
+  summary(PriceNumeric) 
+```
+
+### Type Feature
+
+It has no specified the Type, so since the price is 0, we can assume the category is  Free
+
+```{r}
+apps_versions_dataset %>%  filter(Type == 'NaN')
+
+```
+
+There is only one Type = "NaN", so we can fix it,since the Price = 0, we can set it Free.
+
+```{r}
+apps_versions_dataset$Type[apps_versions_dataset$Type == "NaN"] <- "Free"
+apps_versions_dataset %>%  filter(Type == 'NaN' | App == "Command & Conquer: Rivals")
+```
+
+
+
+### Last updated Feature
+
+We also need to set the dates in a valid format
+
+Let's see if there are more than one format
+
+```{r}
+pattern = "[a-zA-Z]{3,9}\\s[0-9]{1,2},\\s[0-9]{4}"
+
+match_counter <- apps_versions_dataset %>% filter(str_detect(as.character(Last.Updated), pattern =  pattern)) %>% count()
+sprintf("Matching %d of %d", sum(match_counter), nrow(apps_versions_dataset))
+
+```
+
+So all dates seem to be in the same format, so we can convert.
+
+```{r}
+
+apps_versions_dataset <- apps_versions_dataset %>%
+  mutate(Last.UpdatedDate = mdy(Last.Updated))
+
+head(as.tibble(apps_versions_dataset$Last.UpdatedDate))
+
+```
+
+
+### Content Rating Feature
+
+```{r}
+
+apps_versions_dataset %>%
+  select (Content.Rating, App) %>%
+  group_by(Content.Rating) %>%
+  summary(count = count(App))
+
+```
+
+```{r}
+
+apps_versions_dataset$Content.Rating <-factor(apps_versions_dataset$Content.Rating,levels=  c("Everyone","Everyone 10+","Teen","Mature 17+","Adults only 18+","Unrated"))
+
+apps_versions_dataset %>%
+  select (Content.Rating, App) %>%
+  group_by(Content.Rating) %>%
+  summary(count = count(App))
+
+```
+
+
+### Genres Feature
+
+One app can have more than one genre, and the genres are recorded in the same value split by comas, so we need to extract all of them and create the relationship.
+
+**Note: It has been validated that the max number of Genres per apps is 2**
+
+```{r}
+apps_genres_dataset <- apps_genres_dataset %>%
+  mutate (Genres = as.character(Genres)) %>%
+  mutate (Genres.Original = Genres)
+
+apps_genres_dataset %>% 
+  select(Genres) %>%
+  filter(!str_detect(Genres,"^[a-zA-Z\\s\\&]{0,100}$|^[a-zA-Z\\s\\&]{0,100};[a-zA-Z\\s\\&]{0,100}$")) %>%
+  count()
+```
+
+It seems all genres are in the format:
+
+    * Single genre: only the text
+    * Double genre: genres separated by ";"
+
+We need to split the genres, so we have one per row
+
+```{r}
+
+apps_genres_dataset <- apps_genres_dataset %>%
+  separate(Genres, c("Genre1","Genre2"),";") %>%
+  gather("Genres", Genre,  `Genre1`:`Genre2`) %>%
+  select(App, Genre, Genres.Original, -(Genres)) %>%
+  filter(!is.na(Genre)) %>%
+  distinct()
+  
+```
+
+
+### Category Feature
+
+Taking a look to the Category Feature
+
+```{r}
+apps_categories_dataset %>% 
+  select(Category) %>%
+  distinct() 
+```
+
+There are no more than one Category per row, so there is no need to split the values as it was done for Genres
+
 ### Size Feature
 
 This feature seems to be useful if we use it as numeric, anyway we need to remove the 'M' character, but we are not sure if there are other measurement units, such as GB, KB, etc.
 
-
+**CONTINUE HERE** It needs to be setup by joining to Category join.
 ```{r}
-apps_dataset %>% 
+apps_versions_dataset %>% 
   mutate(SizeNumeric = as.numeric(Size)) %>%
   filter(is.na(SizeNumeric)) %>% 
   select(Size, SizeNumeric) %>% head(n = 30)
@@ -528,7 +604,7 @@ Those conventions were determined after some data exploration, you can see in th
 
 pattern <- "(M[a-zA-Z]+)|([a-jl-zA-LN-Z])"
 
-apps_dataset %>% filter(str_detect(Size, pattern = pattern) & Size != 'Varies with device') %>%
+apps_versions_dataset %>% filter(str_detect(Size, pattern = pattern) & Size != 'Varies with device') %>%
   select(App, Size) %>% 
   group_by(Size) %>%
   summary()
@@ -540,20 +616,19 @@ So We have detected that also k is added to the app size measurement, the observ
 #### Create new Size column with the numeric type only
 
 ```{r}
-apps_dataset <- apps_dataset %>%
+apps_versions_dataset <- apps_versions_dataset %>%
   mutate(SizeNumeric = case_when(
     !is.na(Size) & str_detect(Size,"M$") ~ as.numeric(str_replace(Size,"M$","")),
     !is.na(Size) & str_detect(Size,"k$") ~  round(as.numeric(str_replace(Size,"k$",""))/1024,3),
     Size == "Varies with device" ~ mean(NA),
-    TRUE ~ as.numeric(NA)
-  ))
+    TRUE ~ as.numeric(NA)))
 
 ```
 
 We may consider to set the average size for those apps set as "Varies with device"... let's see what is the proportion.
 
 ```{r}
-proportion_of_size <- sum(str_detect(apps_dataset$Size,"^Varies with device$"))/nrow(apps_dataset)
+proportion_of_size <- sum(str_detect(apps_versions_dataset$Size,"^Varies with device$"))/nrow(apps_versions_dataset)
 sprintf("Proportion of Size set as 'Varies with device': %f", proportion_of_size)
 ```
 
@@ -596,263 +671,6 @@ apps_dataset %>%
 ```
 
 **At first sight all app sizes seem to be ok, it is expeted to have some few very big apps.**
-
-### Install feature
-
-We may need to keep it as factor, but we also will need it as numeric, so we are creating a second column with those values
-
-We need to fix an incorrect value for Installs, it's "0" when it should be "0+", also two factors are not needed : "0" and "Free".
-```{r}
-apps_dataset %>% 
-  group_by(Installs) %>%
-  select(Installs, App) %>%
-  summarize(count = n())
-
-# Fixing invalid entry 0
-apps_dataset$Installs[apps_dataset$Installs == "0"] <- "0+"
-
-```
-
-
-
-we need to remove: **",","+" **
-    
-```{r}
-
-options(scipen = 999) # Disabling scientific notation
-apps_dataset <- apps_dataset %>% 
-  mutate(InstallsNumeric = str_replace_all(Installs, "[,*+$]", "")) %>%
-  mutate(InstallsNumeric = as.integer(InstallsNumeric))
-
-na_counter <- apps_dataset %>% 
-    filter(is.na(InstallsNumeric)) %>%
-    count()
-
-sprintf("There are %d NAs", sum(na_counter))
-summary(apps_dataset$InstallsNumeric)
-
-```
-
-There are no NA, it used to be due to the incorrect observation fixed at the beginning... But the current distribution is really odd
-
-```{r}
-
-apps_dataset %>% select(Installs,InstallsNumeric) %>% head()
-
-apps_dataset %>%
-  ggplot(aes(x=50, y = InstallsNumeric)) +
-  geom_boxplot() +
-  ggtitle("Install distribution") +
-  xlab("") +
-  ylab("Installations") +
-  theme(
-    axis.text.x = element_blank(),
-    axis.ticks.x = element_blank())
-```
-
-
-The outliers are really affecting our current box plot view...let remove those in order for usto be the main data.
-
-```{r}
-apps_dataset %>%
-  filter(InstallsNumeric <=1000000) %>%
-  ggplot(aes(x=50, y = InstallsNumeric)) +
-  geom_boxplot() +
-  ggtitle("Install distribution") +
-  xlab("") +
-  ylab("Installations") +
-  theme(
-    axis.text.x = element_blank(),
-    axis.ticks.x = element_blank())
-```
-
-After taking a comparisson between Installations and InstallationNumeric columns, we can see the numbers are correct, and the distribution is really long. We will analyse later in depth
-
-We also need to sort the levels to something that makes more sense to us.
-
-```{r}
-levels_sorted <- c("0+","1+","5+","10+","50+","100+","500+","1,000+","5,000+","10,000+","50,000+","100,000+","500,000+","1,000,000+","5,000,000+","10,000,000+","50,000,000+","100,000,000+","500,000,000+","1,000,000,000+","0","Free")
-
-apps_dataset$Installs <- factor(apps_dataset$Installs,levels = levels_sorted)
-```
-
-
-### Price feature
-
-The price feature is set as factor, we need to convert it to numeric
-
-```{r}
-apps_dataset %>%
-  filter(is.na(as.numeric(Price))) %>%
-  group_by(Type) %>%
-  select(Type) %>%
-  summary()
-
-```
-There are no NAs  
-
-Let's validate there are no format characters
-
-```{r}
-apps_dataset %>%
-  filter(str_detect(Price,pattern = "[a-zA-Z,$]")) %>%
-  select(Price) %>%
-  head()
-
-```
-
-There are format characters, so we need to clean up
-
-```{r}
-apps_dataset <- apps_dataset %>% 
-  mutate(PriceNumeric = as.numeric(str_replace_all(Price,pattern = "[a-zA-Z,$]","")))
-  
-
-```
-
-**Is there any Free application with Price different from 0?**
-
-```{r}
-apps_dataset %>%  filter(Type == 'Free' & Price != '0') %>% count()
-```
-**there is none**
-
-
-**Is there any not free application but the price is 0?**
-
-```{r}
-apps_dataset %>%  filter(Type != 'Free' & Price == '0') %>% count()
-```
-**There is detected one incorrect Type observation, it was missing Free for price = 0**, so this is why the line below is there.
-
-
-```{r}
-apps_dataset %>%  filter(Type != 'Free' & Price == '0')
-```
-
-We didn't get any NA message when converting the Price column, but we are going to double check
-
-```{r}
-apps_dataset %>%
-  filter(is.na(PriceNumeric)) %>%
-  count()
-
-```
-
-Let's check what is the max and min prices (for min we are expecting 0)
-
-```{r}
-apps_dataset %>%  
-  select(PriceNumeric) %>%
-  summary(PriceNumeric) 
-```
-
-### Type feature
-
-It has no specified the Type, so since the price is 0, we can assume the category is  Free
-
-```{r}
-apps_dataset %>%  filter(Type == 'NaN')
-
-```
-
-There is only one Type = "NaN", so we can fix it,since the Price = 0, we can set it Free.
-
-```{r}
-apps_dataset$Type[apps_dataset$Type == "NaN"] <- "Free"
-apps_dataset %>%  filter(Type == 'NaN' | App == "Command & Conquer: Rivals")
-```
-
-
-
-### Last updated feature
-
-We also need to set the dates in a valid format
-
-Let's see if there are more than one format
-
-```{r}
-pattern = "[a-zA-Z]{3,9}\\s[0-9]{1,2},\\s[0-9]{4}"
-
-match_counter <- apps_dataset %>% filter(str_detect(as.character(Last.Updated), pattern =  pattern)) %>% count()
-sprintf("Matching %d of %d", sum(match_counter), nrow(apps_dataset))
-
-```
-
-So all dates seem to be in the same format, so we can convert.
-
-```{r}
-
-apps_dataset <- apps_dataset %>%
-  mutate(Last.UpdatedDate = mdy(Last.Updated))
-
-head(as.tibble(apps_dataset$Last.UpdatedDate))
-
-```
-
-
-
-##Content Rating feature
-
-```{r}
-
-apps_dataset %>%
-  select (Content.Rating, App) %>%
-  group_by(Content.Rating) %>%
-  summary(count = count(App))
-
-```
-
-```{r}
-
-apps_dataset$Content.Rating <-factor(apps_dataset$Content.Rating,levels=  c("Everyone","Everyone 10+","Teen","Mature 17+","Adults only 18+","Unrated"))
-
-apps_dataset %>%
-  select (Content.Rating, App) %>%
-  group_by(Content.Rating) %>%
-  summary(count = count(App))
-
-```
-
-
-
-## Genres feature
-
-One app can have more than one genre, and the genres are recorded in the same value split by comas, so we need to extract all of them and create the relationship.
-
-**Note: It has been validated that the max number of Genres per apps is 2**
-
-```{r}
-genres_dataset <- apps_dataset %>%
-  mutate (Genres = as.character(Genres)) %>%
-  select(App, Genres)
-  
-
-genres_dataset <- genres_dataset %>%  
-  mutate(Test = str_split(genres_dataset$Genres, ";", simplify = TRUE))
-
-apps_dataset_original %>%
-  filter(App %in% c('Coloring book moana'))
-
-apps_dataset %>% 
-  select(App, Category) %>%
-  group_by(App) %>% 
-  count() %>%
-  filter(n > 1) 
-
-apps_dataset_original %>% 
-  filter(App == "8 Ball Pool")
-
-
-genres_dataset %>%  
-  separate( Genres, c("Genre1","Genre2"),";") %>%
-  gather("Genre", Genres,  `Genre1`:`Genre2`) %>% 
-  filter(App %in% c('Coloring book moana')) %>%
-  head()
-#'Photo Editor & Candy Camera & Grid & ScrapBook',
-```
-
-
 
 
 ## Record Counting
