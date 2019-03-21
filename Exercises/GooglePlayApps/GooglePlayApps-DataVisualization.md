@@ -10,43 +10,20 @@ Let's start by taking a look to our current dataset
 library(tidyverse)
 ```
 
-    ## Warning: package 'tidyverse' was built under R version 3.5.2
+    ## ── Attaching packages ───────────────────────────────────────────────────────────────────────────────────────────────────────────────── tidyverse 1.2.1 ──
 
-    ## -- Attaching packages ----------------------------------------------------------------------------------------------------- tidyverse 1.2.1 --
+    ## ✔ ggplot2 3.1.0       ✔ purrr   0.3.1  
+    ## ✔ tibble  2.0.1       ✔ dplyr   0.8.0.1
+    ## ✔ tidyr   0.8.3       ✔ stringr 1.4.0  
+    ## ✔ readr   1.3.1       ✔ forcats 0.4.0
 
-    ## v ggplot2 3.1.0       v purrr   0.3.0  
-    ## v tibble  2.0.1       v dplyr   0.8.0.1
-    ## v tidyr   0.8.2       v stringr 1.4.0  
-    ## v readr   1.3.1       v forcats 0.4.0
-
-    ## Warning: package 'ggplot2' was built under R version 3.5.2
-
-    ## Warning: package 'tibble' was built under R version 3.5.2
-
-    ## Warning: package 'tidyr' was built under R version 3.5.2
-
-    ## Warning: package 'readr' was built under R version 3.5.2
-
-    ## Warning: package 'purrr' was built under R version 3.5.2
-
-    ## Warning: package 'dplyr' was built under R version 3.5.2
-
-    ## Warning: package 'stringr' was built under R version 3.5.2
-
-    ## Warning: package 'forcats' was built under R version 3.5.2
-
-    ## -- Conflicts -------------------------------------------------------------------------------------------------------- tidyverse_conflicts() --
-    ## x dplyr::filter() masks stats::filter()
-    ## x dplyr::lag()    masks stats::lag()
+    ## ── Conflicts ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+    ## ✖ dplyr::filter() masks stats::filter()
+    ## ✖ dplyr::lag()    masks stats::lag()
 
 ``` r
 library(ggplot2)
 library(dslabs)
-```
-
-    ## Warning: package 'dslabs' was built under R version 3.5.2
-
-``` r
 library(forcats)
 
 load("rda/apps_dataset.rda")
@@ -57,13 +34,13 @@ head(apps_dataset)
     ## # A tibble: 6 x 17
     ##   App   Category Rating Reviews Size  Installs Type  Price Content.Rating
     ##   <chr> <fct>     <dbl>   <dbl> <fct> <fct>    <fct> <fct> <fct>         
-    ## 1 Phot~ ART_AND~    4.1    1183 19M   10,000+  Free  0     Everyone      
-    ## 2 Colo~ ART_AND~    3.9    5924 14M   500,000+ Free  0     Everyone      
-    ## 3 U La~ ART_AND~    4.7    5681 8.7M  5,000,0~ Free  0     Everyone      
-    ## 4 Sket~ ART_AND~    4.5    1947 25M   50,000,~ Free  0     Teen          
-    ## 5 Pixe~ ART_AND~    4.3    5924 2.8M  100,000+ Free  0     Everyone      
-    ## 6 Pape~ ART_AND~    4.4    1310 5.6M  50,000+  Free  0     Everyone      
-    ## # ... with 8 more variables: Genres <fct>, Last.Updated <fct>,
+    ## 1 Phot… ART_AND…    4.1    1183 19M   10,000+  Free  0     Everyone      
+    ## 2 Colo… ART_AND…    3.9    5924 14M   500,000+ Free  0     Everyone      
+    ## 3 U La… ART_AND…    4.7    5681 8.7M  5,000,0… Free  0     Everyone      
+    ## 4 Sket… ART_AND…    4.5    1947 25M   50,000,… Free  0     Teen          
+    ## 5 Pixe… ART_AND…    4.3    5924 2.8M  100,000+ Free  0     Everyone      
+    ## 6 Pape… ART_AND…    4.4    1310 5.6M  50,000+  Free  0     Everyone      
+    ## # … with 8 more variables: Genres <fct>, Last.Updated <fct>,
     ## #   Current.Ver <fct>, Android.Ver <fct>, SizeNumeric <dbl>,
     ## #   InstallsNumeric <int>, PriceNumeric <dbl>, Last.UpdatedDate <date>
 
@@ -98,7 +75,7 @@ apps_dataset %>%
   theme(axis.text.x = element_text(angle = 90))
 ```
 
-![](GogglePlayApps-DataVisualization_files/figure-markdown_github/unnamed-chunk-2-1.png)
+![](GooglePlayApps-DataVisualization_files/figure-markdown_github/unnamed-chunk-2-1.png)
 
 #### Horizontal frequency chart
 
@@ -117,7 +94,7 @@ apps_dataset %>%
   theme(axis.text.x = element_text(angle = 90))
 ```
 
-![](GogglePlayApps-DataVisualization_files/figure-markdown_github/unnamed-chunk-3-1.png)
+![](GooglePlayApps-DataVisualization_files/figure-markdown_github/unnamed-chunk-3-1.png)
 
 #### Cleveland plot
 
@@ -135,7 +112,7 @@ apps_dataset %>%
   scale_y_continuous(limits = c(0,2050))
 ```
 
-![](GogglePlayApps-DataVisualization_files/figure-markdown_github/unnamed-chunk-4-1.png)
+![](GooglePlayApps-DataVisualization_files/figure-markdown_github/unnamed-chunk-4-1.png)
 
 ``` r
   theme(axis.text.x = element_text(angle = 90))
@@ -179,7 +156,7 @@ apps_dataset %>%
   )
 ```
 
-![](GogglePlayApps-DataVisualization_files/figure-markdown_github/unnamed-chunk-5-1.png)
+![](GooglePlayApps-DataVisualization_files/figure-markdown_github/unnamed-chunk-5-1.png)
 
 #### Answer
 
@@ -241,7 +218,7 @@ apps_dataset %>%
     axis.text.x = element_text(angle = 90))
 ```
 
-![](GogglePlayApps-DataVisualization_files/figure-markdown_github/unnamed-chunk-6-1.png)
+![](GooglePlayApps-DataVisualization_files/figure-markdown_github/unnamed-chunk-6-1.png)
 
 #### Horizontal frequency chart
 
@@ -258,7 +235,7 @@ apps_dataset %>%
   scale_y_continuous(limits = c(0,1650))
 ```
 
-![](GogglePlayApps-DataVisualization_files/figure-markdown_github/unnamed-chunk-7-1.png)
+![](GooglePlayApps-DataVisualization_files/figure-markdown_github/unnamed-chunk-7-1.png)
 
 #### Cleveland plot
 
@@ -274,7 +251,7 @@ apps_dataset %>%
   scale_y_continuous(limits = c(0,1650))
 ```
 
-![](GogglePlayApps-DataVisualization_files/figure-markdown_github/unnamed-chunk-8-1.png)
+![](GooglePlayApps-DataVisualization_files/figure-markdown_github/unnamed-chunk-8-1.png)
 
 #### Pie chart
 
@@ -291,7 +268,7 @@ apps_dataset %>%
     axis.ticks = element_blank())
 ```
 
-![](GogglePlayApps-DataVisualization_files/figure-markdown_github/unnamed-chunk-9-1.png)
+![](GooglePlayApps-DataVisualization_files/figure-markdown_github/unnamed-chunk-9-1.png)
 
 #### Answer
 
@@ -317,7 +294,7 @@ apps_dataset %>%
   xlab("Type") 
 ```
 
-![](GogglePlayApps-DataVisualization_files/figure-markdown_github/unnamed-chunk-10-1.png)
+![](GooglePlayApps-DataVisualization_files/figure-markdown_github/unnamed-chunk-10-1.png)
 
 #### Horizontal frequency chart
 
@@ -333,7 +310,7 @@ apps_dataset %>%
   geom_bar()
 ```
 
-![](GogglePlayApps-DataVisualization_files/figure-markdown_github/unnamed-chunk-11-1.png)
+![](GooglePlayApps-DataVisualization_files/figure-markdown_github/unnamed-chunk-11-1.png)
 
 #### Cleveland plot
 
@@ -348,7 +325,7 @@ apps_dataset %>%
   geom_text(aes(label = ..count.., vjust=1.5),stat = "count")
 ```
 
-![](GogglePlayApps-DataVisualization_files/figure-markdown_github/unnamed-chunk-12-1.png)
+![](GooglePlayApps-DataVisualization_files/figure-markdown_github/unnamed-chunk-12-1.png)
 
 #### Pie chart
 
@@ -367,7 +344,7 @@ apps_dataset %>%
     axis.ticks = element_blank())
 ```
 
-![](GogglePlayApps-DataVisualization_files/figure-markdown_github/unnamed-chunk-13-1.png)
+![](GooglePlayApps-DataVisualization_files/figure-markdown_github/unnamed-chunk-13-1.png)
 
 #### Answer
 
@@ -391,7 +368,7 @@ apps_dataset %>%
   ylab("Count")
 ```
 
-![](GogglePlayApps-DataVisualization_files/figure-markdown_github/unnamed-chunk-14-1.png)
+![](GooglePlayApps-DataVisualization_files/figure-markdown_github/unnamed-chunk-14-1.png)
 
 #### Horizontal frequency bar
 
@@ -402,10 +379,81 @@ apps_dataset %>%
   ggtitle ("Count of Apps by App Content Ratings") +
   xlab("Content Rating") +
   ylab("Count") +
-  coord_flip()
+  coord_flip() + 
+  geom_text(aes(label = ..count.., hjust = -.1), stat = "count") +
+  scale_y_continuous(limits = c(0,9000))
 ```
 
-![](GogglePlayApps-DataVisualization_files/figure-markdown_github/unnamed-chunk-15-1.png)
+![](GooglePlayApps-DataVisualization_files/figure-markdown_github/unnamed-chunk-15-1.png)
+
+#### Cleveland plot
+
+``` r
+apps_dataset %>%
+  ggplot(aes(x=Content.Rating)) +
+  geom_point(stat = "count") +
+  xlab("Content Rating") +
+  ylab("Count") +
+  coord_flip() +
+  ggtitle("Count of Apps by App Content Rating") + 
+  geom_text(aes(label = ..count.., vjust = -1), stat = "count")
+```
+
+![](GooglePlayApps-DataVisualization_files/figure-markdown_github/unnamed-chunk-16-1.png)
+
+#### Pie chart
+
+``` r
+apps_dataset %>%
+  ggplot(aes(x= "", fill = Content.Rating)) +
+  geom_bar() +
+  coord_polar(theta = "y") +
+  ggtitle("Count of Apps by App Content Rating") +
+  xlab("") +
+  ylab("") +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank()
+  )
+```
+
+![](GooglePlayApps-DataVisualization_files/figure-markdown_github/unnamed-chunk-17-1.png)
+
+#### Answer
+
+Question *How many apps are in each app rating?*
+
+Now we can tell easly how many apps are in each content rating, and also what are the most/less popular. Answer
+
+    * How many apps are in each app rating?
+      We can easly see the data from the chart.
+    * What is the content rating with more apps?
+      - Everyone
+    * what is the content rating with less apps?
+      - Unrated and Adults Only 18+
+
+### How many apps are in each app genre?
+
+As you can see from the first frequency bar, the chart is not what we expected and also this is mainly to the fact that one app can be related to more than one Genre.
+
+#### Frequency chart
+
+``` r
+apps_dataset %>% 
+  ggplot(aes(Genres)) +
+  geom_bar() +
+  xlab("Genres") +
+  ylab("Count") +
+  ggtitle("Count of Apps by App Genre") +
+  theme(
+    axis.text  = element_text(angle = 90))
+```
+
+![](GooglePlayApps-DataVisualization_files/figure-markdown_github/unnamed-chunk-18-1.png)
+
+So we have now a different table with the genres, we can join the data frames and get what we need.
+
+#### Horizontal frequency chart
 
 #### Cleveland plot
 
@@ -413,9 +461,29 @@ apps_dataset %>%
 
 #### Answer
 
-Question *How many apps are in each app rating?*
+Question *How many apps are in each app genre?*
 
 Answer
+
+    * 
+
+### What proportion of apps are supporting the latest version?
+
+#### Frequency chart
+
+#### Horizontal frequency chart
+
+#### Cleveland plot
+
+#### Pie chart
+
+#### Answer
+
+Question *How many apps are in each app genre?*
+
+Answer
+
+    * 
 
 Quantitative Univariate Analysis
 --------------------------------
