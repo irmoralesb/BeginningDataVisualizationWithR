@@ -50,7 +50,7 @@ head(as.tibble(apps_dataset_original))
 ```
 
 Removing extra spaces to App feature
-```{r message=FALSE, comment=FALSE, echo=FALSE}
+```{r echo=TRUE, results='hide'}
 apps_dataset_original %>% 
   mutate(App = str_trim(App))
 ```
@@ -577,11 +577,21 @@ apps_categories_dataset %>%
 
 There are no more than one Category per row, so there is no need to split the values as it was done for Genres
 
+We only need to remove the duplicated entries.
+
+```{r}
+apps_categories_dataset <- apps_categories_dataset %>% 
+  select(App,Category) %>%
+  distinct()
+
+```
+
+
 ### Size Feature
 
 This feature seems to be useful if we use it as numeric, anyway we need to remove the 'M' character, but we are not sure if there are other measurement units, such as GB, KB, etc.
 
-**CONTINUE HERE** It needs to be setup by joining to Category join.
+
 ```{r}
 apps_versions_dataset %>% 
   mutate(SizeNumeric = as.numeric(Size)) %>%
@@ -634,22 +644,29 @@ sprintf("Proportion of Size set as 'Varies with device': %f", proportion_of_size
 
 **This is the 15.6%, it is too high... I am going to fill out it with the mean according to its category** 
 
+** ONE ISSUE TO REVIEW, AFTER MERGE we got 240+ records than expected**
 ```{r}
 size_summary <-  apps_dataset %>% 
+  merge(apps_categories_dataset, by = "App") %>%
+  merge(apps_versions_dataset, by = "App") %>%
   filter(!str_detect(Size, "^Varies with device$")) %>%
   group_by(Category) %>%
   select(Category, SizeNumeric) %>%
   summarize(Mean=round(mean(SizeNumeric),3))
 
-apps_dataset <- apps_dataset %>%
+apps_versions_dataset <- apps_dataset %>%
+  merge(apps_categories_dataset, by = "App") %>%
+  merge(apps_versions_dataset, by = "App") %>%
   group_by(Category) %>%
   mutate(SizeNumeric = case_when(
     is.na(SizeNumeric) ~ mean(SizeNumeric[!is.na(SizeNumeric)]),
     TRUE ~ SizeNumeric)) %>%
-  ungroup()
+  ungroup() %>%
+  select(-c(Category))
   
 # Validating
-apps_dataset %>%
+apps_versions_dataset %>%
+  merge(apps_categories_dataset, by = "App") %>%
   filter(str_detect(Size,"^Varies with device$")) %>%
   group_by(Category) %>%
   select(Category,Size, SizeNumeric) %>%
@@ -660,6 +677,7 @@ Now let's see the current data
 
 ```{r}
 apps_dataset %>% 
+  merge(apps_versions_dataset, by = "App") %>%
   ggplot(aes(x = SizeNumeric, y = SizeNumeric)) +
   geom_boxplot() +
   ggtitle("Distribution of App Size") +
