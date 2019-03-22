@@ -1,0 +1,160 @@
+---
+title: "Data Visualization - Quantitative Univariate Analysis"
+output: github_document
+---
+
+# Data Load
+
+Let's start by taking a look to our current dataset
+
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(dslabs)
+library(forcats)
+
+load("rda/apps_dataset.rda")
+load("rda/apps_categories_dataset.rda")
+load("rda/apps_genres_dataset.rda")
+load("rda/apps_versions_dataset.rda")
+ds_theme_set()
+```
+
+# Data Visualization
+
+So now our data is loaded, let's start by making questions that may fit on the course structure.
+
+## Quantitative Univariate Analysis
+
+**Questions to answer**
+    
+    * What is the app rating mean/max/min?
+    * What is the app reviews mean/max/min?
+    * What is the app size mean/max/min?
+    * What is the app average price for an app?
+    * What is the app installation distribution?
+    * Are apps popularity in 2018 still high in comprarisson to previous years?
+    
+
+### What is the app rating mean/max/min?
+
+Setting up initial variables
+```{r}
+title <- "Distribution of App Ratings"
+x_lab <- "Ratings"
+y_lab <- "Count"
+```
+
+
+#### Dot Plot
+As pointed out in this [link](https://ggplot2.tidyverse.org/reference/geom_dotplot.html) :  
+
+*When binning along the x axis and stacking along the y axis, the numbers on y axis are not meaningful, due to technical limitations of ggplot2. You can hide the y axis, as in one of the examples, or manually scale it to match the number of dots.*  
+
+So we also specify the y axis scale and the dot size, so we can display an approximation to the real distribution.
+
+
+```{r}
+
+apps_versions_dataset %>%
+  filter(!is.na(Rating)) %>%
+  ggplot(aes(x = Rating, stat = "Count")) +
+  geom_dotplot(binwidth = .1, dotsize = .018) +
+  ggtitle(title) +
+  xlab(x_lab) +
+  ylab(y_lab) +
+  scale_y_continuous(limits = c(-1, 1200))
+
+```
+
+
+####Violin dot plot
+
+```{r}
+
+apps_versions_dataset %>%
+  filter(!is.na(Rating)) %>%
+  ggplot(aes(x = Rating, stat="count")) +
+  geom_dotplot(
+    binwidth = .1,
+    dotsize = 0.02,
+    stackdir = "center") +
+  ggtitle(title) +
+  xlab(x_lab)
+  
+```
+
+
+#### Boxplot
+
+```{r}
+apps_versions_dataset %>%
+  filter(!is.na(Rating)) %>%
+  ggplot(aes(x = Rating, y=Rating)) +
+  geom_boxplot() +
+  ggtitle(title) +
+  xlab("") + 
+  ylab(x_lab) +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank())
+```
+
+
+#### Histogram
+
+```{r}
+apps_versions_dataset %>%
+  filter(!is.na(Rating)) %>%
+  ggplot(aes(x = Rating)) +
+  geom_histogram(binwidth = .1) +
+  ggtitle(title) +
+  xlab(x_lab) + 
+  ylab(y_lab)
+```
+
+
+#### Density Plot
+
+```{r}
+apps_versions_dataset %>%
+  filter(!is.na(Rating)) %>%
+  ggplot(aes(x=Rating)) +
+  geom_density() +
+  ggtitle(title) +
+  xlab(x_lab) +
+  ylab(y_lab)
+```
+
+
+
+#### Answer
+*Question: What is the app rating mean/max/min?*
+
+
+### What is the app reviews mean/max/min?
+
+#### Answer
+*Question: What is the app reviews mean/max/min?*
+
+### What is the app size mean/max/min?
+
+#### Answer
+*Question: What is the app size mean/max/min?*
+
+### What is the app average price for an app?
+
+#### Answer
+*Question: What is the app average price for an app?*
+
+### What is the app installation distribution?
+
+#### Answer
+*Question: What is the app installation distribution?*
+
+
+### Are apps popularity in 2018 still high in comprarisson to previous years?
+
+#### Answer
+*Question: Are apps popularity in 2018 still high in comprarisson to previous years?*
