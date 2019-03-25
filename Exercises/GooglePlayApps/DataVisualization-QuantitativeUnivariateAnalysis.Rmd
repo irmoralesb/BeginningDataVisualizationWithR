@@ -28,17 +28,8 @@ So now our data is loaded, let's start by making questions that may fit on the c
 
 ## Quantitative Univariate Analysis
 
-**Questions to answer**
-    
-    * What is the app rating mean/max/min?
-    * What is the app reviews mean/max/min?
-    * What is the app size mean/max/min?
-    * What is the app average price for an app?
-    * What is the app installation distribution?
-    * Are apps popularity in 2018 still high in comprarisson to previous years?
-    
 
-### What is the app rating mean/max/min?
+### Rating Feature Analysis
 
 Setting up initial variables
 ```{r}
@@ -155,24 +146,32 @@ apps_versions_dataset %>%
 
 
 
-#### Answer
+#### Questions/Answers
+
+There is information we can get from the previous chart.
+
+    * This is a left-skewed distribution
+    * About ratings we can tell:
+       - Most of the apps have ratings between 4 and 4.7
+       - Very few apps have rating of 1, which is the less rating value
+       - There are some apps with rating of 5, they are few if compared against the total, but much more significant than those with rating of 1
+       - Most of the apps have good ratings
 
 
-
-### What is the app reviews mean/max/min?
+### Reviews Feature Analysis
 
 #### Dot Plot
 
 ```{r}
 title <- "Distribution of Reviews"
-x_lab <- "Ratings"
+x_lab <- "Reviews"
 
 apps_versions_dataset %>%
   ggplot(aes( x= Reviews, stat="count")) +
   geom_dotplot(binwidth = 10) +
   ggtitle(title) +
   xlab(x_lab) +
-  ylab(y_lab)
+  ylab(y_lab) 
 
 ```
 
@@ -196,7 +195,7 @@ apps_versions_dataset %>%
     main = title,
     xlab = x_lab,
     jitter = TRUE,
-    amount = 1)
+    amount = .3)
 ```
 
 
@@ -233,6 +232,7 @@ apps_versions_dataset %>%
 
 ```{r}
 apps_versions_dataset %>%
+  filter(!is.na(Rating)) %>%  
   ggplot(aes(x = Reviews)) +
   geom_histogram(binwidth = 200) +
   ggtitle(title) +
@@ -247,6 +247,7 @@ apps_versions_dataset %>%
 
 ```{r}
 apps_versions_dataset %>%
+  filter(!is.na(Rating)) %>%  
   ggplot(aes(x = Reviews)) +
   geom_density() +
   ggtitle(title) +
@@ -257,11 +258,17 @@ apps_versions_dataset %>%
 
 
 
-#### Answer
+#### Questions/Answers
 
+There is information we can get from the previous chart.
 
+    * This is not a normal distribution
+    * Most of the data can be gotten easier from Box Plot
+    * About Reviews feature
+       - We can see that there is a  number of apps without Rating
+       - Most of the apps have reviews between  1600 and 4200
 
-### What is the app size mean/max/min?
+### App Size Analysis
 
 #### Dot Plot
 
@@ -352,10 +359,18 @@ apps_versions_dataset %>%
 
 
 
-#### Answer
-*Question: What is the app size mean/max/min?*
+#### Questions/Answers
 
-### What is the app average price for an app?
+There is information we can get from the previous chart.
+
+    * We can see the distribution is right-skewsed
+    * About data:
+       - The size of most apps are 30MB or less.
+       - There are really few apps which size is bigger than 100 MB, event than 50 MB
+
+
+
+### App Price Feature
 
 #### Dot Plot
 
@@ -444,12 +459,15 @@ apps_versions_dataset %>%
 
 ```
 
+#### Questions/Answers
 
+There is information we can get from the previous chart.
 
-#### Answer
-*Question: What is the app average price for an app?*
-
-### What is the app installation distribution?
+    * Most of the apps are free, or really cheap.
+       - The most popular business model is ads.
+    * There are some few expensive apps, up to $400 USD.
+    
+### Installation Feature Analysis
 
 #### Dot Plot
 
@@ -558,11 +576,15 @@ apps_versions_dataset %>%
 ```
 
 
-#### Answer
-*Question: What is the app installation distribution?*
+#### Questions/Answers
 
+There is information we can get from the previous chart.
 
-### Are apps popularity in 2018 still high in comprarisson to previous years?
+    * There are really few apps that are popular, 1,000,000,000 downloads
+    * Most of the apps have less than 100,000 downloads.
+    
+
+### Last Updated Date Feature Analysis
 
 #### Dot Plot
 
@@ -570,16 +592,11 @@ apps_versions_dataset %>%
 ```{r}
 
 title <- "Distribution of App Last Update Over Time"
+x_lab <- "Last Updated Date"
 
-
-years <- apps_versions_dataset %>% 
-  mutate(Year = year(Last.UpdatedDate)) %>%
-  select(Year)
-
-
-  years %>%
-  ggplot(aes(x = Year, stat = "count")) +
-  geom_dotplot(binwidth = .1, dotsize = .01) +
+  apps_versions_dataset %>%
+  ggplot(aes(x = Last.UpdatedDate, stat = "count")) +
+  geom_dotplot(binwidth = 3, dotsize = 1) +
   ggtitle(title) +
   xlab(x_lab) +
   ylab(y_lab)
@@ -588,8 +605,8 @@ years <- apps_versions_dataset %>%
 
 
 ```{r}
-years %>%
-  stripplot(x = ~Year,
+apps_versions_dataset %>%
+  stripplot(x = ~Last.UpdatedDate,
             main = title,
             xlab = x_lab)
 ```
@@ -599,12 +616,12 @@ years %>%
 
 
 ```{r}
-years %>%
+apps_versions_dataset %>%
   stripplot(
-    x = ~ Year,
+    x = ~ Last.UpdatedDate,
     main = title,
     xlab = x_lab,
-    amount = 5,
+    amount = 4,
     jitter = TRUE)
 ```
 
@@ -613,9 +630,9 @@ years %>%
 
 
 ```{r}
-years %>%
-  ggplot(aes(x = Year, stat ="count")) +
-  geom_dotplot(binwidth = .1, dotsize =  0.01, stackdir = "center") +
+apps_versions_dataset %>%
+  ggplot(aes(x = Last.UpdatedDate, stat ="count")) +
+  geom_dotplot(binwidth = 3, dotsize =  1, stackdir = "center") +
   ggtitle(title) +
   xlab(x_lab) +
   ylab(y_lab)
@@ -624,11 +641,46 @@ years %>%
 
 #### Box Plot
 
+```{r}
+apps_versions_dataset %>%
+  ggplot(aes(x =Last.UpdatedDate, y = Last.UpdatedDate)) +
+  ggtitle(title) +
+  xlab("") +
+  ylab(x_lab) +
+  geom_boxplot()
+
+```
+
 
 #### Histogram
+
+```{r}
+apps_versions_dataset %>%
+  ggplot(aes(x = Last.UpdatedDate, stat="count")) +
+  geom_histogram(bins = 100) +
+  ggtitle(title) +
+  xlab(x_lab) 
+
+```
 
 
 #### Density
 
-#### Answer
-*Question: Are apps popularity in 2018 still high in comprarisson to previous years?*
+```{r}
+apps_versions_dataset %>%
+  ggplot(aes(x = Last.UpdatedDate)) +
+  geom_density() +
+  ggtitle(title) +
+  xlab(x_lab) + 
+  ylab(y_lab)
+```
+
+
+#### Questions/Answers
+
+There is information we can get from the previous chart.
+
+    * This is an exponential distribution
+    * About data:
+      - We can tell that all the apps are being updated on 2018, and surely there are more brand new apps in the store from this year than any other previous year.
+      - We know that this is only a sample, and the data may not be treusty to make some assumptions.
