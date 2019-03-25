@@ -13,7 +13,7 @@ library(tidyverse)
 library(ggplot2)
 library(dslabs)
 library(forcats)
-
+library(lattice)
 load("rda/apps_dataset.rda")
 load("rda/apps_categories_dataset.rda")
 load("rda/apps_genres_dataset.rda")
@@ -68,8 +68,33 @@ apps_versions_dataset %>%
 
 ```
 
+So we create it using Lattice
 
-####Violin dot plot
+
+```{r}
+apps_versions_dataset %>%
+ stripplot(x= ~ Rating,
+           main = title,
+           xlab = x_lab) 
+
+```
+
+
+#### Dot Plot Jitter
+
+
+```{r}
+apps_versions_dataset %>%
+  stripplot( x= ~Rating,
+             main = title,
+             xlab = x_lab,
+             jitter = TRUE,
+             amount = 3)
+```
+
+
+
+#### Violin dot plot
 
 ```{r}
 
@@ -130,31 +155,268 @@ apps_versions_dataset %>%
 
 
 #### Answer
-*Question: What is the app rating mean/max/min?*
+
 
 
 ### What is the app reviews mean/max/min?
 
+#### Dot Plot
+
+```{r}
+title <- "Distribution of Reviews"
+x_lab <- "Ratings"
+
+apps_versions_dataset %>%
+  ggplot(aes( x= Reviews, stat="count")) +
+  geom_dotplot(binwidth = 10) +
+  ggtitle(title) +
+  xlab(x_lab) +
+  ylab(y_lab)
+
+```
+
+
+```{r}
+apps_versions_dataset %>%
+  stripplot(
+    x = ~ Reviews,
+    main = title,
+    xlab = x_lab)
+
+```
+
+
+#### Dot Plot Jitter
+
+```{r}
+apps_versions_dataset %>%
+  stripplot( 
+    x = ~Reviews,
+    main = title,
+    xlab = x_lab,
+    jitter = TRUE,
+    amount = 1)
+```
+
+
+#### Violin Plot
+
+```{r}
+apps_versions_dataset %>%
+  ggplot(aes(x=Reviews, stat = "count")) +
+  geom_dotplot(binwidth = 10, stackdir = "center") +
+  ggtitle(title) +
+  xlab(x_lab) +
+  ylab(y_lab)
+
+```
+
+
+#### Box Plot
+
+```{r}
+apps_versions_dataset %>%
+  ggplot(aes(x = Reviews, y = Reviews)) +
+  ggtitle(title) +
+  xlab(x_lab) +
+  ylab("") +
+  geom_boxplot() +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank())
+  
+```
+
+
+#### Histogram
+
+```{r}
+apps_versions_dataset %>%
+  ggplot(aes(x = Reviews)) +
+  geom_histogram(binwidth = 200) +
+  ggtitle(title) +
+  xlab(x_lab) + 
+  ylab(y_lab)
+  
+```
+
+
+
+#### Density
+
+```{r}
+apps_versions_dataset %>%
+  ggplot(aes(x = Reviews)) +
+  geom_density() +
+  ggtitle(title) +
+  xlab(x_lab) +
+  ylab(y_lab)
+```
+
+
+
+
 #### Answer
-*Question: What is the app reviews mean/max/min?*
+
+
 
 ### What is the app size mean/max/min?
+
+#### Dot Plot
+
+```{r}
+title <- "Distribution of App Size"
+x_lab <- "App Size"
+
+apps_versions_dataset %>%
+  ggplot(aes(x = SizeNumeric, stat = "count")) +
+  geom_dotplot(binwidth = .2) +
+  ggtitle(title) +
+  xlab(x_lab) +
+  ylab(y_lab)
+  
+```
+
+
+```{r}
+apps_versions_dataset %>%
+  stripplot(x = ~ SizeNumeric,
+            main= title,
+            xlab = x_lab) 
+```
+
+
+
+#### Dot Plot Jitter
+
+```{r}
+apps_versions_dataset %>%
+  stripplot(x = ~SizeNumeric,
+            main =title,
+            xlab = x_lab,
+            jitter = TRUE, 
+            amount = 2)
+```
+
+
+#### Violin Plot
+
+```{r}
+apps_versions_dataset  %>% 
+  ggplot(aes(x = SizeNumeric, stat = "count"))  +
+  geom_dotplot(binwidth = .2, stackdir = "center") +
+  ggtitle(title) + 
+  xlab(x_lab) +
+  ylab(y_lab)
+
+```
+
+
+#### Box Plot
+
+```{r}
+apps_versions_dataset %>%
+  ggplot(aes(x = SizeNumeric, y = SizeNumeric)) +
+  geom_boxplot() +
+  ggtitle(title) +
+  xlab(x_lab) +
+  ylab("")
+```
+
+
+
+#### Histogram
+
+```{r}
+apps_versions_dataset %>%
+  ggplot(aes(x=SizeNumeric)) +
+  geom_histogram(binwidth = 2) +
+  ggtitle(title) +
+  xlab(x_lab) +
+  ylab(y_lab)
+```
+
+
+
+#### Density
+```{r}
+apps_versions_dataset %>%
+  ggplot(aes(x = SizeNumeric)) +
+  geom_density() +
+  ggtitle(title) +
+  xlab(x_lab) +
+  ylab(y_lab)
+  
+```
+
+
 
 #### Answer
 *Question: What is the app size mean/max/min?*
 
 ### What is the app average price for an app?
 
+#### Dot Plot
+
+
+#### Dot Plot Jitter
+
+
+#### Violin Plot
+
+
+#### Box Plot
+
+
+#### Histogram
+
+
+#### Density
+
 #### Answer
 *Question: What is the app average price for an app?*
 
 ### What is the app installation distribution?
+
+#### Dot Plot
+
+
+#### Dot Plot Jitter
+
+
+#### Violin Plot
+
+
+#### Box Plot
+
+
+#### Histogram
+
+
+#### Density
 
 #### Answer
 *Question: What is the app installation distribution?*
 
 
 ### Are apps popularity in 2018 still high in comprarisson to previous years?
+
+#### Dot Plot
+
+
+#### Dot Plot Jitter
+
+
+#### Violin Plot
+
+
+#### Box Plot
+
+
+#### Histogram
+
+
+#### Density
 
 #### Answer
 *Question: Are apps popularity in 2018 still high in comprarisson to previous years?*
