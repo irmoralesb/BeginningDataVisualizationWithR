@@ -14,6 +14,7 @@ library(ggplot2)
 library(dslabs)
 library(forcats)
 library(lattice)
+library(lubridate)
 load("rda/apps_dataset.rda")
 load("rda/apps_categories_dataset.rda")
 load("rda/apps_genres_dataset.rda")
@@ -218,8 +219,8 @@ apps_versions_dataset %>%
 apps_versions_dataset %>%
   ggplot(aes(x = Reviews, y = Reviews)) +
   ggtitle(title) +
-  xlab(x_lab) +
-  ylab("") +
+  ylab(x_lab) +
+  xlab("") +
   geom_boxplot() +
   theme(
     axis.text.x = element_blank(),
@@ -319,8 +320,8 @@ apps_versions_dataset %>%
   ggplot(aes(x = SizeNumeric, y = SizeNumeric)) +
   geom_boxplot() +
   ggtitle(title) +
-  xlab(x_lab) +
-  ylab("")
+  ylab(x_lab) +
+  xlab("")
 ```
 
 
@@ -358,20 +359,92 @@ apps_versions_dataset %>%
 
 #### Dot Plot
 
+```{r}
+title <- "Distribution of App Price"
+x_lab <- "Price"
+
+apps_versions_dataset %>%
+  ggplot(aes(x=PriceNumeric, stat="count")) +
+  geom_dotplot(binwidth = 1) +
+  ggtitle(title) +
+  xlab(x_lab) +
+  ylab(y_lab)
+
+```
+
+
+```{r}
+apps_versions_dataset %>%
+  stripplot(
+    x = ~ PriceNumeric,
+    main = title,
+    xlab = x_lab) 
+```
+
+
 
 #### Dot Plot Jitter
 
+```{r}
+apps_versions_dataset %>%
+  stripplot( x = ~ PriceNumeric,
+             main = title,
+             xlab = x_lab, 
+             jitter = TRUE,
+             amount = .5)
+```
 
 #### Violin Plot
+
+```{r}
+apps_versions_dataset %>%
+  ggplot(aes(x = PriceNumeric)) +
+  geom_dotplot(binwidth = 2, stackdir = "center") +
+  ggtitle(title) +
+  xlab(x_lab)
+```
 
 
 #### Box Plot
 
+```{r}
+apps_versions_dataset %>%
+  ggplot(aes(x = PriceNumeric, y = PriceNumeric)) +
+  geom_boxplot() +
+  ggtitle(title) +
+  ylab(x_lab) +
+  xlab("")
+```
+
+
 
 #### Histogram
 
+```{r}
+apps_versions_dataset %>%
+  ggplot(aes(x = PriceNumeric)) +
+  geom_histogram(binwidth = 10) +
+  ggtitle(title) +
+  xlab(x_lab) +
+  ylab(y_lab) +
+  geom_text(aes(label = ..count.., vjust = -1.8), stat = "count")
+
+```
+
 
 #### Density
+
+```{r}
+apps_versions_dataset %>%
+  ggplot(aes(x = PriceNumeric)) +
+  geom_density() +
+  xlab(x_lab) +
+  ylab(y_lab) +
+  ggtitle(title)
+
+```
+
+
 
 #### Answer
 *Question: What is the app average price for an app?*
@@ -380,20 +453,110 @@ apps_versions_dataset %>%
 
 #### Dot Plot
 
+```{r}
+options(scipen = 999) # Disabling Scientific notation
+title <-  "Distribution of App Installations"
+xlab <- "Installations"
+apps_versions_dataset %>%
+  ggplot(aes(x = InstallsNumeric, stat = "count")) +
+  geom_dotplot(binwidth = 100000) +
+  ggtitle(title) +
+  xlab(x_lab) +
+  ylab(y_lab)
+
+```
+
+
+```{r}
+apps_versions_dataset %>%
+  stripplot(x = ~ InstallsNumeric,
+            main = title,
+            xlab = x_lab)
+```
+
+
 
 #### Dot Plot Jitter
+
+```{r}
+apps_versions_dataset %>%
+  stripplot(x = ~ InstallsNumeric,
+          jitter = TRUE,
+          amount = 1,
+          xlab = x_lab,
+          main = title)
+```
+
 
 
 #### Violin Plot
 
+```{r}
+apps_versions_dataset %>%
+  ggplot(aes(x = InstallsNumeric, stat = "count")) +
+  geom_dotplot(stackdir = "center", binwidth = 100000) +
+  ggtitle(title) +
+  xlab(x_lab) +
+  ylab(y_lab)
+```
+
 
 #### Box Plot
+
+```{r}
+apps_versions_dataset %>%
+  ggplot(aes(x = InstallsNumeric, y = InstallsNumeric)) +
+  geom_boxplot() +
+  ggtitle(title) +
+  xlab("") +
+  ylab(x_lab) +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank())
+  
+```
+
+Removing Outliers
+
+```{r}
+apps_versions_dataset %>%
+  filter(InstallsNumeric <= 750000) %>%
+  ggplot(aes(x = InstallsNumeric, y = InstallsNumeric)) +
+  geom_boxplot() +
+  ggtitle(title) +
+  xlab("") +
+  ylab(x_lab) +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank())
+  
+```
 
 
 #### Histogram
 
+```{r}
+apps_versions_dataset %>%
+  ggplot(aes(x = InstallsNumeric)) +
+  ggtitle(title) +
+  xlab(x_lab) + 
+  ylab(y_lab) +
+  geom_histogram()
+```
+
+
 
 #### Density
+
+```{r}
+apps_versions_dataset %>%
+  ggplot(aes(x = InstallsNumeric)) +
+  geom_density() +
+  ggtitle(title) +
+  xlab(x_lab) +
+  ylab(y_lab)
+```
+
 
 #### Answer
 *Question: What is the app installation distribution?*
@@ -404,10 +567,59 @@ apps_versions_dataset %>%
 #### Dot Plot
 
 
+```{r}
+
+title <- "Distribution of App Last Update Over Time"
+
+
+years <- apps_versions_dataset %>% 
+  mutate(Year = year(Last.UpdatedDate)) %>%
+  select(Year)
+
+
+  years %>%
+  ggplot(aes(x = Year, stat = "count")) +
+  geom_dotplot(binwidth = .1, dotsize = .01) +
+  ggtitle(title) +
+  xlab(x_lab) +
+  ylab(y_lab)
+  
+```
+
+
+```{r}
+years %>%
+  stripplot(x = ~Year,
+            main = title,
+            xlab = x_lab)
+```
+
+
 #### Dot Plot Jitter
 
 
+```{r}
+years %>%
+  stripplot(
+    x = ~ Year,
+    main = title,
+    xlab = x_lab,
+    amount = 5,
+    jitter = TRUE)
+```
+
+
 #### Violin Plot
+
+
+```{r}
+years %>%
+  ggplot(aes(x = Year, stat ="count")) +
+  geom_dotplot(binwidth = .1, dotsize =  0.01, stackdir = "center") +
+  ggtitle(title) +
+  xlab(x_lab) +
+  ylab(y_lab)
+```
 
 
 #### Box Plot
