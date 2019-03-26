@@ -1,0 +1,146 @@
+---
+title: "Data Visualization - Quantitative Bivariate Analysis"
+output: github_document
+---
+
+# Data Load
+
+Let's start by taking a look to our current dataset
+
+
+```{r}
+library(tidyverse)
+library(dslabs)
+
+load("rda/apps_dataset.rda")
+load("rda/apps_categories_dataset.rda")
+load("rda/apps_genres_dataset.rda")
+load("rda/apps_versions_dataset.rda")
+ds_theme_set()
+```
+
+# Data Visualization
+
+## Quantitative Bivariate Analysis
+
+Quantitative Features:
+
+    * Ratings
+    * Reviews
+    * Size (Numeric)
+    * Price
+    * Last Updated
+    * Installs (Numeric)
+
+
+
+### Ratings vs Reviews
+
+#### Scatterplot
+
+#### Binned Frequency Heatmap
+
+#### Hexagonal Binned Frequency Heatmap
+
+#### Countour Plot
+
+#### Level Plot
+
+#### Mesh Plot
+
+#### Surface Plot
+
+#### Step Chart
+
+#### Line Chart
+
+#### Area chart
+
+### Ratings vs Size
+
+#### Scatterplot
+
+#### Binned Frequency Heatmap
+
+#### Hexagonal Binned Frequency Heatmap
+
+#### Countour Plot
+
+#### Level Plot
+
+#### Mesh Plot
+
+#### Surface Plot
+
+#### Step Chart
+
+#### Line Chart
+
+#### Area chart
+
+### Ratings vs Last Updated
+
+#### Scatterplot
+
+#### Binned Frequency Heatmap
+
+#### Hexagonal Binned Frequency Heatmap
+
+#### Countour Plot
+
+#### Level Plot
+
+#### Mesh Plot
+
+#### Surface Plot
+
+#### Step Chart
+
+#### Line Chart
+
+#### Area chart
+
+### Ratings vs Price
+
+#### Scatterplot
+
+#### Binned Frequency Heatmap
+
+#### Hexagonal Binned Frequency Heatmap
+
+#### Countour Plot
+
+#### Level Plot
+
+#### Mesh Plot
+
+#### Surface Plot
+
+#### Step Chart
+
+#### Line Chart
+
+#### Area chart
+
+### Size vs Price
+
+#### Scatterplot
+
+#### Binned Frequency Heatmap
+
+#### Hexagonal Binned Frequency Heatmap
+
+#### Countour Plot
+
+#### Level Plot
+
+#### Mesh Plot
+
+#### Surface Plot
+
+#### Step Chart
+
+#### Line Chart
+
+#### Area chart
+
