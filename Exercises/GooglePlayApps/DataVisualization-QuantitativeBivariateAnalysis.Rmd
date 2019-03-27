@@ -488,14 +488,43 @@ grid %>%
 ```
 
 
-
 ### Size vs Price
 
 #### Scatterplot
 
+```{r}
+title <- "Size vs Price"
+x_lab <- "Size"
+y_lab <- "Price"
+
+ggplot <- apps_versions_dataset %>%
+  ggplot(aes(x = SizeNumeric, y = PriceNumeric)) +
+  ggtitle(title) +
+  xlab(x_lab) +
+  ylab(y_lab)
+  
+  ggplot +
+  geom_point()
+  
+```
+
 #### Binned Frequency Heatmap
 
+```{r}
+  ggplot +
+  stat_bin2d()
+  
+```
+
 #### Hexagonal Binned Frequency Heatmap
+
+```{r}
+  ggplot + 
+  stat_binhex()
+
+```
+
+
 
 #### Countour Plot
 
