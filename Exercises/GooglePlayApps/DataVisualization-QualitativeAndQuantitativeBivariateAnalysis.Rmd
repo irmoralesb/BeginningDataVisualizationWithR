@@ -1,0 +1,194 @@
+---
+title: "Data Visualization - Quantitative Bivariate Analysis"
+output: github_document
+---
+
+# Data Load
+
+Let's start by taking a look to our current dataset
+
+
+```{r}
+library(tidyverse)
+library(dslabs)
+library(lattice)
+library(lubridate)
+
+load("rda/apps_dataset.rda")
+load("rda/apps_categories_dataset.rda")
+load("rda/apps_genres_dataset.rda")
+load("rda/apps_versions_dataset.rda")
+ds_theme_set()
+```
+
+# Data Visualization
+
+## Quantitative Bivariate Analysis
+
+Quantitative Features:
+
+    * Ratings
+    * Reviews
+    * Size (Numeric)
+    * Price
+
+
+Qualitative Features:
+
+    * Category
+    * Installs (Install range)
+    * Type (Free/Paid)
+    * Content Rating
+    * Genre
+
+
+### Content Rating vs Reviews
+
+
+#### Bivariate Bar Chart
+```{r}
+
+options(scipen = 999) # Disabling Scientific notation
+ggplot <- apps_versions_dataset %>%
+  ggplot(aes(x = Content.Rating, y = Reviews)) +
+  ggtitle("Rating by Content Rating") +
+  xlab("Content Rating") +
+  ylab("Reviews")
+
+
+ggplot +
+  geom_bar(stat = "identity") 
+  
+```
+
+#### Boxplot
+
+```{r}
+
+ggplot +
+  geom_boxplot()
+
+```
+
+
+#### Notched Boxplot
+
+```{r}
+
+ggplot +
+  geom_boxplot(notch = TRUE)
+
+```
+
+
+
+#### Violin Plot
+
+```{r}
+ggplot +
+  geom_violin()
+```
+
+
+### Content Rating vs Price
+
+#### Bivariate Bar Chart
+
+```{r}
+ggplot <-  apps_versions_dataset %>%
+  filter(Type == "Paid") %>%
+  ggplot(aes(x = Content.Rating, y = PriceNumeric)) +
+  ggtitle("Price by Content Rating") +
+  xlab("Content Rating") +
+  ylab("Price")
+
+
+ggplot +
+  geom_bar(stat = "identity")
+```
+
+#### Box Plot
+
+```{r}
+ggplot +
+  geom_boxplot()
+```
+
+Removing some outliers
+
+```{r}
+ggplot2 <-  apps_versions_dataset %>%
+  filter(Type == "Paid" & PriceNumeric <= 50) %>%
+  ggplot(aes(x = Content.Rating, y = PriceNumeric)) +
+  ggtitle("Price by Content Rating") +
+  xlab("Content Rating") +
+  ylab("Price")
+  
+  ggplot2 +
+    geom_boxplot()
+
+```
+
+
+
+#### Notched Box Plot
+
+```{r}
+ggplot +
+  geom_boxplot(notch =  TRUE)
+```
+
+We remove some outliers
+
+```{r}
+ggplot2 +
+  geom_boxplot(notch = TRUE)
+```
+
+
+
+#### Violin Plot
+
+```{r}
+ggplot +
+  geom_violin()
+```
+
+
+### Type vs Reviews
+
+
+#### Bivariate Bar Chart
+```{r}
+ggplot <- apps_versions_dataset %>%
+  ggplot(aes(x = Type, y = Reviews)) +
+  ggtitle("Reviews by Type") +
+  xlab("Type") +
+  ylab("Reviews")
+
+
+ggplot +
+  geom_bar(stat = "identity")
+  
+```
+
+#### Box Plot
+
+```{r}
+ggplot +
+  geom_boxplot()
+```
+
+#### Notched Box Plot
+
+```{r}
+ggplot +
+  geom_boxplot(notch = TRUE)
+```
+
+#### Violin Plot
+
+```{r}
+ggplot +
+  geom_violin()
+```
