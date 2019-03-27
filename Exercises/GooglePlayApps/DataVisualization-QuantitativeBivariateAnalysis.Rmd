@@ -12,6 +12,7 @@ Let's start by taking a look to our current dataset
 library(tidyverse)
 library(dslabs)
 library(lattice)
+library(lubridate)
 
 load("rda/apps_dataset.rda")
 load("rda/apps_categories_dataset.rda")
@@ -498,6 +499,7 @@ x_lab <- "Size"
 y_lab <- "Price"
 
 ggplot <- apps_versions_dataset %>%
+  filter(Type == "Paid") %>%
   ggplot(aes(x = SizeNumeric, y = PriceNumeric)) +
   ggtitle(title) +
   xlab(x_lab) +
@@ -525,15 +527,62 @@ ggplot <- apps_versions_dataset %>%
 ```
 
 
-
 #### Countour Plot
+
+```{r}
+ggplot +
+  geom_density2d()
+```
+
 
 #### Level Plot
 
+```{r}
+ggplot +
+  stat_density2d(aes(fill = ..level..) , geom = "polygon")
+```
+
+
 #### Mesh Plot
+
+
+```{r}
+temp_data <- apps_versions_dataset %>% filter(Type == "Paid")
+
+density2d <- kde2d(
+  x = temp_data$SizeNumeric,
+  y = temp_data$PriceNumeric,
+  n = 50)
+
+grid <- expand.grid(
+  x = density2d$x,
+  y = density2d$y)
+
+grid$z <- as.vector(density2d$z)
+
+grid %>%
+  wireframe(
+    x = z ~ x * y,
+    main = title,
+    xlab = x_lab,
+    ylab = y_lab,
+    zlab = z_lab)
+```
+
 
 #### Surface Plot
 
+```{r}
+grid %>%
+  wireframe(
+    x = z ~ x * y,
+    main = title,
+    xlab = x_lab,
+    ylab = y_lab,
+    zlab = z_lab,
+    drape = TRUE
+  )
+```
 
 
 
@@ -541,16 +590,104 @@ ggplot <- apps_versions_dataset %>%
 
 #### Step Chart
 
+```{r}
+title <- "Ratings by Year"
+x_lab <- "Year"
+y_lab <- "Rating"
+
+temp_data <- apps_versions_dataset %>% 
+  filter(!is.na(Rating) & !is.nan(Rating)) %>%
+  mutate(Year.Month = round_date(Last.UpdatedDate, unit = "month")) %>%
+  group_by(Year.Month) %>%
+  summarize(Date =max(Year.Month),Max = max(Rating), Min = min(Rating),Mean = mean(Rating), n = n())
+  
+  
+temp_data %>% 
+  ggplot(aes(x = Date, y= Mean)) +
+  geom_step() +
+  ggtitle(title) +
+  xlab(x_lab) +
+  ylab(y_lab) +
+  expand_limits(y = 0)
+
+```
+
+
 #### Line Chart
+
+```{r}
+temp_data %>%
+  ggplot(aes(x = Date, y= Mean)) +
+  ggtitle(title) +
+  xlab(x_lab) +
+  ylab(y_lab) +
+  geom_line() +
+  expand_limits(y = 0)
+  
+```
+
 
 #### Area chart
 
+```{r}
+temp_data %>%
+  ggplot(aes(x = Date, y= Mean)) +
+  ggtitle(title) +
+  xlab(x_lab) +
+  ylab(y_lab) +
+  geom_area() +
+  expand_limits(y = 0)
+
+```
 
 
 ### Apps vs Last Updated
 
 #### Step Chart
 
+```{r}
+title <- "Apps by Year"
+y_lab <- "Apps"
+
+temp_data <- apps_versions_dataset %>%
+  mutate(Year.Month = round_date(Last.UpdatedDate, unit = "month")) %>%
+  group_by(Year.Month)  %>%
+  summarize(Date = max(Year.Month), Count = n())
+
+
+temp_data %>%
+  ggplot(aes(x = Date, y = Count)) +
+  geom_step() +
+  ggtitle(title) +
+  xlab(x_lab) +
+  ylab(y_lab) +
+  expand_limits(y = 0)
+
+```
+
 #### Line Chart
 
+```{r}
+temp_data %>%
+  ggplot(aes(x = Date, y = Count)) +
+  geom_line() +
+  ggtitle(title) +
+  xlab(x_lab) +
+  ylab(y_lab) +
+  expand_limits(y = 0)
+  
+```
+
+
 #### Area chart
+
+```{r}
+temp_data %>%
+  ggplot(aes(x = Date, y = Count)) +
+  geom_area() +
+  ggtitle(title) +
+  xlab(x_lab) +
+  ylab(y_lab) +
+  expand_limits(y = 0)
+  
+```
